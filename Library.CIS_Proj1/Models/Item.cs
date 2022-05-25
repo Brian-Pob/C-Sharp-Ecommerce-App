@@ -3,11 +3,11 @@ namespace Library.CIS_Proj1.Models
 {
 	public partial class Item
 	{
+		public int Id { get; set; }
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public float Price { get; set; }
 		public int Quantity { get; set; }
-		public int Id { get; set; }
 		public float TotalPrice
         {
 			get
@@ -27,7 +27,12 @@ namespace Library.CIS_Proj1.Models
         public override string ToString()
         {
             return $"{Id} - {Name}: {Description}. ${Price} x {Quantity} = ${TotalPrice}";
-        } 
-    }
+        }
+
+		public Item Clone()
+		{
+			return (Item)this.MemberwiseClone();
+		}
+	}
 }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Library.CIS_Proj1.Models;
+using Newtonsoft.Json;
 namespace Library.CIS_Proj1.Services
 {
 	public class CartService
@@ -52,7 +53,7 @@ namespace Library.CIS_Proj1.Services
             {
                 if (!Items.Any())
                 {
-                    return 1;
+                    return 0;
                 }
 
                 return Items.Select(t => t.Id).Max() + 1;
@@ -62,11 +63,103 @@ namespace Library.CIS_Proj1.Services
         /* CRUD methods */
         public bool Create(Item item)
         {
-            item.Id = NextId;
-            Items.Add(item);
+            if(item.Quantity <= 1)
+            {
+                Console.WriteLine("Invalid quantity supplied.");
+                return false;
+            }
+            
+            foreach(Item i in InventoryService.Items)
+            {
+                if(i.Id == item.Id)
+                {
+                    Console.WriteLine("found matching item");
+                    if(item.Quantity > i.Quantity)
+                    {
+                        Console.WriteLine("Quantity requested is greater than supply. Adding all to cart.");
+                        item.Quantity = i.Quantity;
+                    }
+                    if(item.Quantity == 0)
+                    {
+                        Console.WriteLine("No available supply. Nothing added to cart");
+                        return false;
+                    }
+
+                    Console.WriteLine("Quantity subtracted from inventory. Added to cart");
+                    i.Quantity -= item.Quantity;
+                    var newItem = i.Clone();
+                    newItem.Quantity = item.Quantity;
+
+                    foreach(Item i2 in Items)
+                    {
+                        if(i2.Id == newItem.Id)
+                        {
+                            Console.WriteLine("Item is already in cart. Updating cart quantity.");
+                            i2.Quantity += newItem.Quantity;
+                            return true;
+                        }
+                    }
+
+                    Items.Add(newItem); 
+                    return true;
+                }
+            }
+
+            Console.WriteLine("No item found. Nothing added to cart.");
+            return false;
+        }
+
+        public bool Delete(Item item)
+        {
+            foreach(Item i in Items)
+            {
+                if(i.Id == item.Id)
+                {
+                    Console.WriteLine("Found item in cart");
+                    if(i.Quantity < item.Quantity)
+                    {
+                        Console.WriteLine("Qty to be removed exceeds existing qty. Removing all from cart.");
+                        item.Quantity = i.Quantity;
+                    }
+
+                    i.Quantity -= item.Quantity;
+                    if(i.Quantity == 0)
+                    {
+                        Console.WriteLine("Cart item quantity is 0. Item completely removed from cart.");
+                        Items.Remove(i);
+                    }
+
+                    foreach(Item i2 in inventoryService.Items)
+                    {
+                        if(i2.Id == item.Id)
+                        {
+                            Console.WriteLine("Updating inventory qty");
+                            i2.Quantity += item.Quantity;
+                            break;
+                        }
+                    }
+
+                    Console.WriteLine("Item qty removed from cart.");
+                    return true;
+                }
+            }
+            Console.WriteLine("Item not found in cart.");
+            return false;
+        }
+
+        public bool Save(string filename)
+        {
+            var cartJson = JsonConvert.SerializeObject(itemList);
+            File.WriteAllText(filename, cartJson);
             return true;
         }
 
+        public bool Load(string filename)
+        {
+            var cartJson = File.ReadAllText(filename);
+            itemList = JsonConvert.DeserializeObject<List<Item>>(cartJson) ?? new List<Item>();
+            return true;
+        }
         /* Testing methods */
         public bool CartListInv()
         {

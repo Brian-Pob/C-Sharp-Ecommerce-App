@@ -61,12 +61,20 @@ namespace CIS_Proj1
                 {
                     Console.WriteLine("Adding to Cart");
                     var newItem = new Item();
-                    FillItem(newItem);
-                    // get Inventory itemList
-                    // check if item exists
-                    // check if quantity is enough
-                    // update cart with new quantity (only quantity should be updated)
-                    // create new item in Cart
+                    Console.WriteLine("Item number: ");
+                    _ = int.TryParse(Console.ReadLine() ?? "0", out int itemId);
+                    newItem.Id = itemId;
+
+                    Console.WriteLine("Item Quantity: ");
+                    _ = int.TryParse(Console.ReadLine() ?? "0", out int quant);
+                    newItem.Quantity = quant;
+
+                    if(quant <= 0)
+                    {
+                        Console.WriteLine("Quantity must be greater than 0");
+                        continue;
+                    }
+
                     cartService.Create(newItem);
                 }
                 else if (action == ActionType.ListCart)
@@ -78,10 +86,38 @@ namespace CIS_Proj1
                 else if (action == ActionType.DeleteFromCart)
                 {
                     Console.WriteLine("Deleting from Cart");
+                    var newItem = new Item();
+                    Console.WriteLine("Item number: ");
+                    _ = int.TryParse(Console.ReadLine() ?? "0", out int itemId);
+                    newItem.Id = itemId;
+
+                    Console.WriteLine("Item Quantity: ");
+                    _ = int.TryParse(Console.ReadLine() ?? "0", out int quant);
+                    newItem.Quantity = quant;
+
+                    if (quant <= 0)
+                    {
+                        Console.WriteLine("Quantity must be greater than 0");
+                        continue;
+                    }
+
+                    cartService.Delete(newItem);
                 }
                 else if (action == ActionType.SearchCart)
                 {
                     Console.WriteLine("Searching Cart");
+                }
+                else if (action == ActionType.Save)
+                {
+                    Console.WriteLine("Saving Inventory and Cart");
+                    inventoryService.Save("inventory.json");
+                    cartService.Save("cart.json");
+                }
+                else if (action == ActionType.Load)
+                {
+                    Console.WriteLine("Loading Inventory and Cart");
+                    inventoryService.Load("inventory.json");
+                    cartService.Load("cart.json");
                 }
                 else if (action == ActionType.Exit)
                 {
@@ -102,7 +138,7 @@ namespace CIS_Proj1
                 Console.WriteLine($"{i++} - {lt}");
 
             }
-            int selection = int.Parse(Console.ReadLine() ?? "0");
+            _ = int.TryParse(Console.ReadLine() ?? "0", out int selection);
 
             if (selection >= Enum.GetNames(typeof(LoginType)).Length || selection < 0)
                 selection = 0;
@@ -129,7 +165,7 @@ namespace CIS_Proj1
                 }
                 i++;
             }
-            int selection = int.Parse(Console.ReadLine() ?? "0");
+            _ = int.TryParse(Console.ReadLine() ?? "0", out int selection);
 
             if (selection >= Enum.GetNames(typeof(ActionType)).Length || selection < 0)
                 selection = 0;
@@ -171,6 +207,7 @@ namespace CIS_Proj1
     {
         AddToInventory, ListInventory, UpdateInventory, SearchInventory,
         AddToCart, ListCart, DeleteFromCart, SearchCart,
+        Save, Load,
         Exit
     }
 }

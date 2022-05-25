@@ -1,5 +1,6 @@
 ﻿using System;
 using Library.CIS_Proj1.Models;
+using Newtonsoft.Json;
 namespace Library.CIS_Proj1.Services
 {
 	public class InventoryService
@@ -83,6 +84,19 @@ namespace Library.CIS_Proj1.Services
             return false;
         }
 
+        public bool Save(string filename)
+        {
+            var inventoryJson = JsonConvert.SerializeObject(itemList);
+            File.WriteAllText(filename, inventoryJson);
+            return true;
+        }
+
+        public bool Load(string filename)
+        {
+            var inventoryJson = File.ReadAllText(filename);
+            itemList = JsonConvert.DeserializeObject<List<Item>>(inventoryJson) ?? new List<Item>();
+            return true;
+        }
         /* Testing methods */
         public bool InvListCart()
         {
