@@ -97,16 +97,28 @@ namespace Library.CIS_Proj1.Services
             itemList = JsonConvert.DeserializeObject<List<Item>>(inventoryJson) ?? new List<Item>();
             return true;
         }
-        /* Testing methods */
-        public bool InvListCart()
+
+        public void List()
         {
-            var cartItemList = CartService.Items;
-            Console.WriteLine("InvListCart:");
-            foreach (Item item in cartItemList)
+            foreach (Item item in Items)
             {
                 Console.WriteLine(item);
             }
-            return true;
         }
+
+        public List<Item> Search(string term)
+        {
+            List<Item> foundItems = new List<Item>();
+            foreach(Item item in Items)
+            {
+                if(item.Name.Contains(term) || item.Description.Contains(term))
+                {
+                    foundItems.Add(item.Clone());
+                }
+            }
+            return foundItems;
+        }
+
+        
     }
 }

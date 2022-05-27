@@ -6,9 +6,19 @@ namespace Library.CIS_Proj1.Models
 		public int Id { get; set; }
 		public string Name { get; set; }
 		public string Description { get; set; }
-		public float Price { get; set; }
+		private decimal price;
+		public decimal Price {
+			get
+            {
+				return price;
+            }
+			set
+			{
+				price = Decimal.Round(value, 2);
+			}
+		}
 		public int Quantity { get; set; }
-		public float TotalPrice
+		public decimal TotalPrice
         {
 			get
             {

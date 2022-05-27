@@ -33,11 +33,6 @@ namespace CIS_Proj1
                         FillItem(newItem);
                         inventoryService.Create(newItem);
                     }
-                    else if (action == ActionType.ListInventory)
-                    {
-                        Console.WriteLine("Listing Inventory");
-                        cartService.CartListInv();
-                    }
                     else if (action == ActionType.UpdateInventory)
                     {
                         Console.WriteLine("Updating Inventory");
@@ -50,62 +45,74 @@ namespace CIS_Proj1
                         FillItem(newItem);
                         inventoryService.Update(newItem);
                     }
-                    else if (action == ActionType.SearchInventory)
+                }
+
+                if (action == ActionType.ListInventory)
+                {
+                    Console.WriteLine("Listing Inventory");
+                    inventoryService.List();
+                }
+                else if (action == ActionType.SearchInventory)
+                {
+                    Console.WriteLine("Searching Inventory");
+                    Console.WriteLine("Enter term to search for: ");
+                    string term = Console.ReadLine() ?? "";
+                    List<Item> foundItems = inventoryService.Search(term);
+
+                    if(foundItems.Count == 0)
                     {
-                        Console.WriteLine("Searching Inventory");
+                        Console.WriteLine($"No items found in inventory with {term} in name or description.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Found items: ");
+                        foreach(Item item in foundItems)
+                        {
+                            Console.WriteLine(item);
+                        }
                     }
                 }
-                
-
-                if (action == ActionType.AddToCart)
+                else if (action == ActionType.AddToCart)
                 {
                     Console.WriteLine("Adding to Cart");
                     var newItem = new Item();
-                    Console.WriteLine("Item number: ");
-                    _ = int.TryParse(Console.ReadLine() ?? "0", out int itemId);
-                    newItem.Id = itemId;
+                    if (FillIdAndQuantity(newItem))
+                        cartService.Create(newItem);
 
-                    Console.WriteLine("Item Quantity: ");
-                    _ = int.TryParse(Console.ReadLine() ?? "0", out int quant);
-                    newItem.Quantity = quant;
-
-                    if(quant <= 0)
-                    {
-                        Console.WriteLine("Quantity must be greater than 0");
-                        continue;
-                    }
-
-                    cartService.Create(newItem);
                 }
                 else if (action == ActionType.ListCart)
                 {
                     Console.WriteLine("Listing Cart");
-                    inventoryService.InvListCart();
+                    cartService.List();
 
                 }
                 else if (action == ActionType.DeleteFromCart)
                 {
                     Console.WriteLine("Deleting from Cart");
                     var newItem = new Item();
-                    Console.WriteLine("Item number: ");
-                    _ = int.TryParse(Console.ReadLine() ?? "0", out int itemId);
-                    newItem.Id = itemId;
-
-                    Console.WriteLine("Item Quantity: ");
-                    _ = int.TryParse(Console.ReadLine() ?? "0", out int quant);
-                    newItem.Quantity = quant;
-
-                    if (quant <= 0)
-                    {
-                        Console.WriteLine("Quantity must be greater than 0");
-                        continue;
-                    }
-
-                    cartService.Delete(newItem);
+                    
+                    if(FillIdAndQuantity(newItem))
+                        cartService.Delete(newItem);
                 }
                 else if (action == ActionType.SearchCart)
                 {
                     Console.WriteLine("Searching Cart");
+                    Console.WriteLine("Enter term to search for: ");
+                    string term = Console.ReadLine() ?? "";
+                    List<Item> foundItems = cartService.Search(term);
+
+                    if (foundItems.Count == 0)
+                    {
+                        Console.WriteLine($"No items found in cart with {term} in name or description.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Found items: ");
+                        foreach (Item item in foundItems)
+                        {
+                            Console.WriteLine(item);
+                        }
+                    }
                 }
                 else if (action == ActionType.Save)
                 {
@@ -118,6 +125,11 @@ namespace CIS_Proj1
                     Console.WriteLine("Loading Inventory and Cart");
                     inventoryService.Load("inventory.json");
                     cartService.Load("cart.json");
+                }
+                else if (action == ActionType.Checkout)
+                {
+                    Console.WriteLine("Checking out");
+                    Checkout(cartService);
                 }
                 else if (action == ActionType.Exit)
                 {
@@ -154,7 +166,7 @@ namespace CIS_Proj1
             {
                 if(login == LoginType.Customer)
                 {
-                    if (!action.ToString().Contains("Inventory"))
+                    if (!action.ToString().Contains("Inventory") || action.ToString().Contains("List") || action.ToString().Contains("Search"))
                     {
                         Console.WriteLine($"{i} - {action}");
                     }
@@ -189,12 +201,53 @@ namespace CIS_Proj1
             Console.WriteLine("Item price:");
             // Discard variable _ indicates that we do not need the result
             // of the function.
-            _ = float.TryParse(Console.ReadLine(), out float price);
+            _ = decimal.TryParse(Console.ReadLine(), out decimal price);
             item.Price = price;
 
             Console.WriteLine("Item quantity:");
             _ = int.TryParse(Console.ReadLine(), out int quantity);
             item.Quantity = quantity;
+        }
+
+        public static bool FillIdAndQuantity(Item newItem)
+        {
+            Console.WriteLine("Item number: ");
+            _ = int.TryParse(Console.ReadLine() ?? "0", out int itemId);
+            newItem.Id = itemId;
+
+            Console.WriteLine("Item Quantity: ");
+            _ = int.TryParse(Console.ReadLine() ?? "0", out int quant);
+            newItem.Quantity = quant;
+
+            if (quant <= 0)
+            {
+                Console.WriteLine("Quantity must be greater than 0");
+                return false;
+            }
+
+            return true;
+        }
+
+        public static void Checkout(CartService cartService)
+        {
+            Console.WriteLine("Your cart has the following items");
+            cartService.List();
+            decimal total = cartService.GetTotal();
+            double salesTax = .075;
+            Console.WriteLine("Subtotal: $" + total);
+            Console.WriteLine("7.5% Sales Tax: $" + Decimal.Round((total * (decimal)salesTax), 2));
+            Console.WriteLine("Total: $" + Decimal.Round((total + total * (decimal)salesTax), 2));
+            Console.WriteLine("Confirm checkout? (Y/n): ");
+            var input = Console.ReadLine();
+            if(input == "Y" || input == "y")
+            {
+                cartService.Items.Clear();
+                Console.WriteLine("Checked out. All items removed from cart.");
+            }
+            else
+            {
+                Console.WriteLine("Exiting checkout.");
+            }
         }
     }
 
@@ -206,7 +259,7 @@ namespace CIS_Proj1
     public enum ActionType
     {
         AddToInventory, ListInventory, UpdateInventory, SearchInventory,
-        AddToCart, ListCart, DeleteFromCart, SearchCart,
+        AddToCart, ListCart, DeleteFromCart, SearchCart, Checkout,
         Save, Load,
         Exit
     }
