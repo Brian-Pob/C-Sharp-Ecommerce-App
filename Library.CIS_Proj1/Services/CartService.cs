@@ -63,7 +63,7 @@ namespace Library.CIS_Proj1.Services
         /* CRUD methods */
         public bool Create(Product product)
         {
-            if(product.Quantity <= 1)
+            if(product.Quantity <= 0)
             {
                 Console.WriteLine("Invalid quantity supplied.");
                 return false;
