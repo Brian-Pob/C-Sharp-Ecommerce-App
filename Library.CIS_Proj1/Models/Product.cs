@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Library.CIS_Proj1.Models
 {
-	public partial class Item
+	public partial class Product
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
@@ -26,7 +26,7 @@ namespace Library.CIS_Proj1.Models
             }
         }
 
-		public Item()
+		public Product()
 		{
 			Name = string.Empty;
 			Description = string.Empty;
@@ -39,9 +39,9 @@ namespace Library.CIS_Proj1.Models
             return $"{Id} - {Name}: {Description}. ${Price} x {Quantity} = ${TotalPrice}";
         }
 
-		public Item Clone()
+		public Product Clone()
 		{
-			return (Item)this.MemberwiseClone();
+			return (Product)this.MemberwiseClone();
 		}
 	}
 }

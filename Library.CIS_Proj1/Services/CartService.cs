@@ -5,7 +5,7 @@ namespace Library.CIS_Proj1.Services
 {
 	public class CartService
 	{
-		private InventoryService inventoryService;
+		private InventoryService? inventoryService;
 		public InventoryService InventoryService
 		{
 			get
@@ -19,16 +19,16 @@ namespace Library.CIS_Proj1.Services
             }
 		}
 
-		private List<Item> itemList;
-		public List<Item> Items
+		private List<Product> productList;
+		public List<Product> Products
         {
 			get
             {
-				return itemList;
+				return productList;
             }
         }
 
-		private static CartService current;
+		private static CartService? current;
 		public static CartService Current
         {
 			get
@@ -44,112 +44,112 @@ namespace Library.CIS_Proj1.Services
 
 		public CartService()
 		{
-			itemList = new List<Item>();
+			productList = new List<Product>();
 		}
 
         public int NextId
         {
             get
             {
-                if (!Items.Any())
+                if (!Products.Any())
                 {
                     return 0;
                 }
 
-                return Items.Select(t => t.Id).Max() + 1;
+                return Products.Select(t => t.Id).Max() + 1;
             }
         }
 
         /* CRUD methods */
-        public bool Create(Item item)
+        public bool Create(Product product)
         {
-            if(item.Quantity <= 1)
+            if(product.Quantity <= 1)
             {
                 Console.WriteLine("Invalid quantity supplied.");
                 return false;
             }
             
-            foreach(Item i in InventoryService.Items)
+            foreach(Product p in InventoryService.Products)
             {
-                if(i.Id == item.Id)
+                if(p.Id == product.Id)
                 {
-                    Console.WriteLine("found matching item");
-                    if(item.Quantity > i.Quantity)
+                    Console.WriteLine("found matching product");
+                    if(product.Quantity > p.Quantity)
                     {
                         Console.WriteLine("Quantity requested is greater than supply. Adding all to cart.");
-                        item.Quantity = i.Quantity;
+                        product.Quantity = p.Quantity;
                     }
-                    if(item.Quantity == 0)
+                    if(product.Quantity == 0)
                     {
                         Console.WriteLine("No available supply. Nothing added to cart");
                         return false;
                     }
 
                     Console.WriteLine("Quantity subtracted from inventory. Added to cart");
-                    i.Quantity -= item.Quantity;
-                    var newItem = i.Clone();
-                    newItem.Quantity = item.Quantity;
+                    p.Quantity -= product.Quantity;
+                    var newProduct = p.Clone();
+                    newProduct.Quantity = product.Quantity;
 
-                    foreach(Item i2 in Items)
+                    foreach(Product p2 in Products)
                     {
-                        if(i2.Id == newItem.Id)
+                        if(p2.Id == newProduct.Id)
                         {
-                            Console.WriteLine("Item is already in cart. Updating cart quantity.");
-                            i2.Quantity += newItem.Quantity;
+                            Console.WriteLine("Product is already in cart. Updating cart quantity.");
+                            p2.Quantity += newProduct.Quantity;
                             return true;
                         }
                     }
 
-                    Items.Add(newItem); 
+                    Products.Add(newProduct); 
                     return true;
                 }
             }
 
-            Console.WriteLine("No item found. Nothing added to cart.");
+            Console.WriteLine("No product found. Nothing added to cart.");
             return false;
         }
 
-        public bool Delete(Item item)
+        public bool Delete(Product product)
         {
-            foreach(Item i in Items)
+            foreach(Product p in Products)
             {
-                if(i.Id == item.Id)
+                if(p.Id == product.Id)
                 {
-                    Console.WriteLine("Found item in cart");
-                    if(i.Quantity < item.Quantity)
+                    Console.WriteLine("Found product in cart");
+                    if(p.Quantity < product.Quantity)
                     {
                         Console.WriteLine("Qty to be removed exceeds existing qty. Removing all from cart.");
-                        item.Quantity = i.Quantity;
+                        product.Quantity = p.Quantity;
                     }
 
-                    i.Quantity -= item.Quantity;
-                    if(i.Quantity == 0)
+                    p.Quantity -= product.Quantity;
+                    if(p.Quantity == 0)
                     {
-                        Console.WriteLine("Cart item quantity is 0. Item completely removed from cart.");
-                        Items.Remove(i);
+                        Console.WriteLine("Cart product quantity is 0. Product completely removed from cart.");
+                        Products.Remove(p);
                     }
 
-                    foreach(Item i2 in inventoryService.Items)
+                    foreach(Product p2 in inventoryService.Products)
                     {
-                        if(i2.Id == item.Id)
+                        if(p2.Id == product.Id)
                         {
                             Console.WriteLine("Updating inventory qty");
-                            i2.Quantity += item.Quantity;
+                            p2.Quantity += product.Quantity;
                             break;
                         }
                     }
 
-                    Console.WriteLine("Item qty removed from cart.");
+                    Console.WriteLine("Product qty removed from cart.");
                     return true;
                 }
             }
-            Console.WriteLine("Item not found in cart.");
+            Console.WriteLine("Product not found in cart.");
             return false;
         }
 
         public bool Save(string filename)
         {
-            var cartJson = JsonConvert.SerializeObject(itemList);
+            var cartJson = JsonConvert.SerializeObject(productList);
             File.WriteAllText(filename, cartJson);
             return true;
         }
@@ -157,37 +157,37 @@ namespace Library.CIS_Proj1.Services
         public bool Load(string filename)
         {
             var cartJson = File.ReadAllText(filename);
-            itemList = JsonConvert.DeserializeObject<List<Item>>(cartJson) ?? new List<Item>();
+            productList = JsonConvert.DeserializeObject<List<Product>>(cartJson) ?? new List<Product>();
             return true;
         }
 
         public void List()
         {
-            foreach(Item item in Items)
+            foreach(Product product in Products)
             {
-                Console.WriteLine(item);
+                Console.WriteLine(product);
             }
         }
 
-        public List<Item> Search(string term)
+        public List<Product> Search(string term)
         {
-            List<Item> foundItems = new List<Item>();
-            foreach (Item item in Items)
+            List<Product> foundProducts = new List<Product>();
+            foreach (Product product in Products)
             {
-                if (item.Name.Contains(term) || item.Description.Contains(term))
+                if (product.Name.ToLower().Contains(term.ToLower()) || product.Description.ToLower().Contains(term.ToLower()))
                 {
-                    foundItems.Add(item.Clone());
+                    foundProducts.Add(product.Clone());
                 }
             }
-            return foundItems;
+            return foundProducts;
         }
 
         public decimal GetTotal()
         {
             decimal total = 0;
-            foreach(Item item in Items)
+            foreach(Product product in Products)
             {
-                total += item.TotalPrice;
+                total += product.TotalPrice;
             }
 
             return total;

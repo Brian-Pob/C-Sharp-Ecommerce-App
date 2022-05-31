@@ -5,7 +5,7 @@ namespace Library.CIS_Proj1.Services
 {
 	public class InventoryService
 	{
-		private CartService cartService;
+		private CartService? cartService;
 		public CartService CartService
         {
 			get
@@ -19,16 +19,16 @@ namespace Library.CIS_Proj1.Services
             }
         }
 
-		private List<Item> itemList;
-		public List<Item> Items
+		private List<Product> productList;
+		public List<Product> Products
         {
 			get
             {
-				return itemList;
+				return productList;
             }
         }
 
-		private static InventoryService current;
+		private static InventoryService? current;
 		public static InventoryService Current
         {
             get
@@ -44,49 +44,64 @@ namespace Library.CIS_Proj1.Services
         
 		public InventoryService()
 		{
-            itemList = new List<Item>();
+            productList = new List<Product>();
 		}
 
         public int NextId
         {
             get
             {
-                if (!Items.Any())
+                if (!Products.Any())
                 {
                     return 0;
                 }
 
-                return Items.Select(t => t.Id).Max() + 1;
+                return Products.Select(t => t.Id).Max() + 1;
             }
         }
 
         /* CRUD methods */
-        public bool Create(Item item)
+        public bool Create(Product product)
         {
-            item.Id = NextId;
-            Items.Add(item);
+            product.Id = NextId;
+            Products.Add(product);
             return true;
         }
 
-        public bool Update(Item item)
+        public bool Update(Product product)
         {
-            for(int i = 0; i < Items.Count; i++)
+            for(int i = 0; i < Products.Count; i++)
             {
-                if(Items[i].Id == item.Id)
+                if(Products[i].Id == product.Id)
                 {
-                    Console.WriteLine("Found matching item. Updating information.");
-                    item.Id = Items[i].Id;
-                    Items[i] = item;
+                    Console.WriteLine("Found matching product. Updating information.");
+                    Products[i] = product;
                     return true;
                 }
             }
-            Console.WriteLine("Item ID not found. Nothing was updated.");
+            Console.WriteLine("Product ID not found. Nothing was updated.");
+            return false;
+        }
+
+        public bool UpdateProductQuantity(Product product)
+        {
+            for(int i = 0; i < Products.Count; i++)
+            {
+                if(Products[i].Id == product.Id)
+                {
+                    Console.WriteLine("Found matching product. Updating Quantity.");
+                    Products[i].Quantity = product.Quantity;
+                    return true;
+                }
+            }
+
+            Console.WriteLine("Failed to update item quantity. Nothing was updated.");
             return false;
         }
 
         public bool Save(string filename)
         {
-            var inventoryJson = JsonConvert.SerializeObject(itemList);
+            var inventoryJson = JsonConvert.SerializeObject(productList);
             File.WriteAllText(filename, inventoryJson);
             return true;
         }
@@ -94,29 +109,29 @@ namespace Library.CIS_Proj1.Services
         public bool Load(string filename)
         {
             var inventoryJson = File.ReadAllText(filename);
-            itemList = JsonConvert.DeserializeObject<List<Item>>(inventoryJson) ?? new List<Item>();
+            productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson) ?? new List<Product>();
             return true;
         }
 
         public void List()
         {
-            foreach (Item item in Items)
+            foreach (Product product in Products)
             {
-                Console.WriteLine(item);
+                Console.WriteLine(product);
             }
         }
 
-        public List<Item> Search(string term)
+        public List<Product> Search(string term)
         {
-            List<Item> foundItems = new List<Item>();
-            foreach(Item item in Items)
+            List<Product> foundProducts = new List<Product>();
+            foreach(Product product in Products)
             {
-                if(item.Name.Contains(term) || item.Description.Contains(term))
+                if(product.Name.ToLower().Contains(term.ToLower()) || product.Description.ToLower().Contains(term.ToLower()))
                 {
-                    foundItems.Add(item.Clone());
+                    foundProducts.Add(product.Clone());
                 }
             }
-            return foundItems;
+            return foundProducts;
         }
 
         
