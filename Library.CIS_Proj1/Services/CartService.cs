@@ -1,7 +1,7 @@
 ﻿using System;
-using Library.CIS_Proj1.Models;
+using Library.CIS_Proj.Models;
 using Newtonsoft.Json;
-namespace Library.CIS_Proj1.Services
+namespace Library.CIS_Proj.Services
 {
 	public class CartService
 	{

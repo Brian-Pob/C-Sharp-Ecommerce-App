@@ -1,9 +1,9 @@
 ﻿using System;
-using Library.CIS_Proj1.Models;
-using Library.CIS_Proj1.Services;
+using Library.CIS_Proj.Models;
+using Library.CIS_Proj.Services;
 using Newtonsoft.Json;
 
-namespace CIS_Proj1
+namespace CIS_Proj
 {
     internal class Program
     {
@@ -140,7 +140,11 @@ namespace CIS_Proj1
                 else if (action == ActionType.Checkout)
                 {
                     Console.WriteLine("Checking out");
-                    Checkout(cartService);
+                    if (Checkout(cartService))
+                    {
+                        Console.WriteLine("Exiting");
+                        break;
+                    }
                 }
                 else if (action == ActionType.Exit)
                 {
@@ -241,7 +245,7 @@ namespace CIS_Proj1
             return true;
         }
 
-        public static void Checkout(CartService cartService)
+        public static bool Checkout(CartService cartService)
         {
             Console.WriteLine("Your cart has the following items");
             cartService.List();
@@ -256,10 +260,12 @@ namespace CIS_Proj1
             {
                 cartService.Products.Clear();
                 Console.WriteLine("Checked out. All items removed from cart.");
+                return true;
             }
             else
             {
                 Console.WriteLine("Exiting checkout.");
+                return false;
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Library.CIS_Proj1.Models
+namespace Library.CIS_Proj.Models
 {
 	public partial class Product
 	{
