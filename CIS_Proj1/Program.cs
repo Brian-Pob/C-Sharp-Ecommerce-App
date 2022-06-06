@@ -9,6 +9,10 @@ namespace CIS_Proj
     {
         static void Main(string[] args)
         {
+            List<string> types = ListEnum(new ActionType());
+            foreach (string type in types) { Console.WriteLine(type); }
+            return;
+
             var cartService = CartService.Current;
             var inventoryService = InventoryService.Current;
             cartService.InventoryService = inventoryService;
@@ -26,18 +30,17 @@ namespace CIS_Proj
                 var action = SelectActionType(login);
                 if(login == LoginType.Employee)
                 {
+                        var newItem = new ProductByQuantity();
                     if (action == ActionType.AddToInventory)
                     {
                         Console.WriteLine("Adding to inventory");
-                        var newItem = new Product();
-                        FillItem(newItem);
+                        FillQuantityItem(newItem);
                         inventoryService.Create(newItem);
                     }
                     else if (action == ActionType.UpdateInventory)
                     {
                         Console.WriteLine("Updating Inventory");
 
-                        var newItem = new Product();
                         
 
                         Console.Write("Updating quantity only? (Y/n");
@@ -52,7 +55,7 @@ namespace CIS_Proj
                             Console.Write("Item ID:  ");
                             _ = int.TryParse(Console.ReadLine() ?? "0", out int itemId);
                             newItem.Id = itemId;
-                            FillItem(newItem);
+                            FillQuantityItem(newItem);
                             inventoryService.Update(newItem);
                         }
                     }
@@ -86,7 +89,7 @@ namespace CIS_Proj
                 else if (action == ActionType.AddToCart)
                 {
                     Console.WriteLine("Adding to Cart");
-                    var newItem = new Product();
+                    var newItem = new ProductByQuantity();
                     if (FillIdAndQuantity(newItem))
                         cartService.Create(newItem);
 
@@ -100,7 +103,7 @@ namespace CIS_Proj
                 else if (action == ActionType.DeleteFromCart)
                 {
                     Console.WriteLine("Deleting from Cart");
-                    var newItem = new Product();
+                    var newItem = new ProductByQuantity();
                     
                     if(FillIdAndQuantity(newItem))
                         cartService.Delete(newItem);
@@ -202,7 +205,7 @@ namespace CIS_Proj
             return (ActionType)selection;
         }
 
-        public static void FillItem(Product? item)
+        public static void FillQuantityItem(ProductByQuantity? item)
         {
             if(item == null)
             {
@@ -226,7 +229,7 @@ namespace CIS_Proj
             item.Quantity = quantity;
         }
 
-        public static bool FillIdAndQuantity(Product newItem)
+        public static bool FillIdAndQuantity(ProductByQuantity newItem)
         {
             Console.Write("Item number:  ");
             _ = int.TryParse(Console.ReadLine() ?? "0", out int itemId);
@@ -268,6 +271,17 @@ namespace CIS_Proj
                 return false;
             }
         }
+
+        public static List<string> ListEnum(Enum myEnum)
+        {
+            List<string> list = new List<string>();
+            int i = 0;
+            foreach (var item in Enum.GetValues(myEnum.GetType()))
+            {
+                list.Add($"{i++} - {item}");
+            }
+            return list;
+        }
     }
 
     public enum LoginType
@@ -281,5 +295,10 @@ namespace CIS_Proj
         AddToCart, ListCart, DeleteFromCart, SearchCart, Checkout,
         Save, Load,
         Exit
+    }
+
+    public enum ProductType
+    {
+        Quantity, Weight
     }
 }

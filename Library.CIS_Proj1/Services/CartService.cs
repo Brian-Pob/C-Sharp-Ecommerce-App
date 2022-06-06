@@ -61,7 +61,7 @@ namespace Library.CIS_Proj.Services
         }
 
         /* CRUD methods */
-        public bool Create(Product product)
+        public bool Create(ProductByQuantity product)
         {
             if(product.Quantity <= 0)
             {
@@ -69,7 +69,7 @@ namespace Library.CIS_Proj.Services
                 return false;
             }
             
-            foreach(Product p in InventoryService.Products)
+            foreach(ProductByQuantity p in InventoryService.Products)
             {
                 if(p.Id == product.Id)
                 {
@@ -87,7 +87,7 @@ namespace Library.CIS_Proj.Services
 
                     Console.WriteLine("Quantity subtracted from inventory. Added to cart");
                     p.Quantity -= product.Quantity;
-                    var newProduct = p.Clone();
+                    ProductByQuantity newProduct = ((ProductByQuantity) p.Clone()) ;
                     newProduct.Quantity = product.Quantity;
 
                     foreach(Product p2 in Products)
@@ -95,7 +95,7 @@ namespace Library.CIS_Proj.Services
                         if(p2.Id == newProduct.Id)
                         {
                             Console.WriteLine("Product is already in cart. Updating cart quantity.");
-                            p2.Quantity += newProduct.Quantity;
+                            ((ProductByQuantity) p2).Quantity += newProduct.Quantity;
                             return true;
                         }
                     }
@@ -116,28 +116,28 @@ namespace Library.CIS_Proj.Services
                 if(p.Id == product.Id)
                 {
                     Console.WriteLine("Found product in cart");
-                    if(p.Quantity < product.Quantity)
-                    {
-                        Console.WriteLine("Qty to be removed exceeds existing qty. Removing all from cart.");
-                        product.Quantity = p.Quantity;
-                    }
+                    //if(p.Quantity < product.Quantity)
+                    //{
+                    //    Console.WriteLine("Qty to be removed exceeds existing qty. Removing all from cart.");
+                    //    product.Quantity = p.Quantity;
+                    //}
 
-                    p.Quantity -= product.Quantity;
-                    if(p.Quantity == 0)
-                    {
-                        Console.WriteLine("Cart product quantity is 0. Product completely removed from cart.");
-                        Products.Remove(p);
-                    }
+                    //p.Quantity -= product.Quantity;
+                    //if(p.Quantity == 0)
+                    //{
+                    //    Console.WriteLine("Cart product quantity is 0. Product completely removed from cart.");
+                    //    Products.Remove(p);
+                    //}
 
-                    foreach(Product p2 in inventoryService.Products)
-                    {
-                        if(p2.Id == product.Id)
-                        {
-                            Console.WriteLine("Updating inventory qty");
-                            p2.Quantity += product.Quantity;
-                            break;
-                        }
-                    }
+                    //foreach(Product p2 in inventoryService.Products)
+                    //{
+                    //    if(p2.Id == product.Id)
+                    //    {
+                    //        Console.WriteLine("Updating inventory qty");
+                    //        p2.Quantity += product.Quantity;
+                    //        break;
+                    //    }
+                    //}
 
                     Console.WriteLine("Product qty removed from cart.");
                     return true;

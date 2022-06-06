@@ -83,14 +83,14 @@ namespace Library.CIS_Proj.Services
             return false;
         }
 
-        public bool UpdateProductQuantity(Product product)
+        public bool UpdateProductQuantity(ProductByQuantity product)
         {
             for(int i = 0; i < Products.Count; i++)
             {
                 if(Products[i].Id == product.Id)
                 {
                     Console.WriteLine("Found matching product. Updating Quantity.");
-                    Products[i].Quantity = product.Quantity;
+                    ((ProductByQuantity) Products[i]).Quantity = product.Quantity;
                     return true;
                 }
             }
