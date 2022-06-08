@@ -6,7 +6,8 @@ namespace Library.CIS_Proj.Models
 		public int Id { get; set; }
 		public string? Name { get; set; }
 		public string? Description { get; set; }
-		private decimal price;
+        public bool isBogo { get; set; }
+        private decimal price;
 		public decimal Price {
 			get
             {
@@ -24,6 +25,8 @@ namespace Library.CIS_Proj.Models
 		}
 
 		public decimal TotalPrice { get; }
+
+        
 	}
 }
 

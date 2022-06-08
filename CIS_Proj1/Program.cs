@@ -2,6 +2,10 @@
 using Library.CIS_Proj.Models;
 using Library.CIS_Proj.Services;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CIS_Proj
 {
@@ -9,10 +13,6 @@ namespace CIS_Proj
     {
         static void Main(string[] args)
         {
-            List<string> types = ListEnum(new ActionType());
-            foreach (string type in types) { Console.WriteLine(type); }
-            return;
-
             var cartService = CartService.Current;
             var inventoryService = InventoryService.Current;
             cartService.InventoryService = inventoryService;
@@ -22,65 +22,45 @@ namespace CIS_Proj
 
             LoginType login = SelectLoginType();
 
-            Console.WriteLine($"You chose:  {login}.");
+            Console.WriteLine($"You chose: {login}.");
 
             bool cont = true;
             while (cont)
             {
                 var action = SelectActionType(login);
-                if(login == LoginType.Employee)
+                
+                if (action == ActionType.Exit)
                 {
-                        var newItem = new ProductByQuantity();
-                    if (action == ActionType.AddToInventory)
-                    {
-                        Console.WriteLine("Adding to inventory");
-                        FillQuantityItem(newItem);
-                        inventoryService.Create(newItem);
-                    }
-                    else if (action == ActionType.UpdateInventory)
-                    {
-                        Console.WriteLine("Updating Inventory");
-
-                        
-
-                        Console.Write("Updating quantity only? (Y/n");
-                        if((Console.ReadLine() ?? "n").ToLower() == "y")
-                        {
-                            FillIdAndQuantity(newItem);
-                            inventoryService.UpdateProductQuantity(newItem);
-                        }
-                        else
-                        {
-                            Console.Write("Enter new item data: ");
-                            Console.Write("Item ID:  ");
-                            _ = int.TryParse(Console.ReadLine() ?? "0", out int itemId);
-                            newItem.Id = itemId;
-                            FillQuantityItem(newItem);
-                            inventoryService.Update(newItem);
-                        }
-                    }
+                    break;
                 }
-
-                if (action == ActionType.ListInventory)
+                else if (action == ActionType.ListInventory)
                 {
-                    Console.WriteLine("Listing Inventory");
-                    inventoryService.List();
+                    Console.WriteLine("--- Listing Inventory ---");
+                    
+                    Console.WriteLine("Sort By: ");
+                    Console.WriteLine("0 - Id (Default)");
+                    Console.WriteLine("1 - Name");
+                    Console.WriteLine("2 - Unit Price");
+
+                    _ = int.TryParse(Console.ReadLine() ?? "0", out int choice);
+
+                    inventoryService.List(choice);
                 }
                 else if (action == ActionType.SearchInventory)
                 {
-                    Console.WriteLine("Searching Inventory");
+                    Console.WriteLine("--- Searching Inventory ---");
                     Console.Write("Enter term to search for:  ");
                     string term = Console.ReadLine() ?? "";
                     List<Product> foundItems = inventoryService.Search(term);
 
-                    if(foundItems.Count == 0)
+                    if (foundItems.Count == 0)
                     {
                         Console.WriteLine($"No items found in inventory with {term} in name or description.");
                     }
                     else
                     {
                         Console.WriteLine("Found items:  ");
-                        foreach(Product item in foundItems)
+                        foreach (Product item in foundItems)
                         {
                             Console.WriteLine(item);
                         }
@@ -88,30 +68,63 @@ namespace CIS_Proj
                 }
                 else if (action == ActionType.AddToCart)
                 {
-                    Console.WriteLine("Adding to Cart");
-                    var newItem = new ProductByQuantity();
-                    if (FillIdAndQuantity(newItem))
-                        cartService.Create(newItem);
+                    Console.WriteLine("--- Adding to Cart ---");
+                    Console.Write("Enter Id of item to add to cart: ");
+                    _ = int.TryParse(Console.ReadLine() ?? "0", out int id);
+                    var product = inventoryService.Products.Find(p => p.Id == id);
+                    if (product == null)
+                    {
+                        Console.WriteLine($"No item found with Id {id}.");
+                    }
+                    else
+                    {
+                        product = product.Clone();
+                        Console.WriteLine($"Adding {product.Name} to cart.");
+
+                        if (product.GetType() == typeof(ProductByQuantity))
+                        {
+                            Console.Write("Enter quantity to add to cart: ");
+                            _ = int.TryParse(Console.ReadLine() ?? "0", out int quantity);
+                            ((ProductByQuantity)product).Quantity = quantity;
+                        }
+                        else if (product.GetType() == typeof(ProductByWeight))
+                        {
+                            Console.Write("Enter weight to add to cart: ");
+                            _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal weight);
+                            ((ProductByWeight)product).Weight = weight;
+                        }
+                        if (cartService.AddToCart(product))
+                        {
+                            Console.WriteLine($"Added {product.Name} to cart.");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Failed to add {product.Name} to cart.");
+                        }
+                    }
 
                 }
                 else if (action == ActionType.ListCart)
                 {
-                    Console.WriteLine("Listing Cart");
-                    cartService.List();
+                    Console.WriteLine("--- Listing Cart ---");
+                    Console.WriteLine("Sort By: ");
+                    Console.WriteLine("0 - Id (Default)");
+                    Console.WriteLine("1 - Name");
+                    Console.WriteLine("2 - Total Price");
 
+                    _ = int.TryParse(Console.ReadLine() ?? "0", out int choice);
+
+                    cartService.List(choice);
+                    cartService.NavigateList();
                 }
                 else if (action == ActionType.DeleteFromCart)
                 {
-                    Console.WriteLine("Deleting from Cart");
-                    var newItem = new ProductByQuantity();
-                    
-                    if(FillIdAndQuantity(newItem))
-                        cartService.Delete(newItem);
+                    Console.WriteLine("--- Deleting from Cart ---");
                 }
                 else if (action == ActionType.SearchCart)
                 {
-                    Console.WriteLine("Searching Cart");
-                    Console.Write("Enter term to search for:  ");
+                    Console.WriteLine("--- Searching Cart ---");
+                    Console.Write("Enter term to search for: ");
                     string term = Console.ReadLine() ?? "";
                     List<Product> foundItems = cartService.Search(term);
 
@@ -130,30 +143,79 @@ namespace CIS_Proj
                 }
                 else if (action == ActionType.Save)
                 {
+                    Console.WriteLine("--- Saving Cart and Inventory Data ---");
                     Console.WriteLine("Saving Inventory and Cart");
-                    inventoryService.Save("inventory.json");
-                    cartService.Save("cart.json");
+                    inventoryService.Save();
+                    cartService.Save();
                 }
                 else if (action == ActionType.Load)
                 {
+                    Console.WriteLine("--- Loading Cart and Inventory Data ---");
                     Console.WriteLine("Loading Inventory and Cart");
-                    inventoryService.Load("inventory.json");
-                    cartService.Load("cart.json");
+                    inventoryService.Load();
+                    cartService.Load();
                 }
                 else if (action == ActionType.Checkout)
                 {
-                    Console.WriteLine("Checking out");
+                    Console.WriteLine("--- Checking Out ---");
                     if (Checkout(cartService))
                     {
                         Console.WriteLine("Exiting");
                         break;
                     }
+                    else
+                    {
+                        Console.WriteLine("Checkout failed.");
+                    }
                 }
-                else if (action == ActionType.Exit)
+
+                /* Employee Only Actions */
+                if (login != LoginType.Employee)
+                    continue;
+                
+                if (action == ActionType.AddToInventory)
                 {
-                    Console.WriteLine("Exiting");
-                    break;
+                    Product newProduct;
+                    Console.WriteLine("--- Adding to Inventory ---");
+                    var productType = SelectProductType();
+                    if(productType == ProductType.Quantity)
+                    {
+                        Console.WriteLine("--- Adding Product By Quantity ---");
+                        newProduct = new ProductByQuantity();
+                        FillQuantityProduct((ProductByQuantity)newProduct);
+                        if (inventoryService.Create(newProduct))
+                        {
+                            Console.WriteLine("Product added successfully.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Product could not be added.");
+                        }
+                    }
+                    else if(productType == ProductType.Weight)
+                    {
+                        Console.WriteLine("--- Adding Product By Weight ---");
+                        newProduct = new ProductByWeight();
+                        FillWeightProduct((ProductByWeight)newProduct);
+                        if (inventoryService.Create(newProduct))
+                        {
+                            Console.WriteLine("Product added successfully.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Product could not be added.");
+                        }
+                    }
+                    else if(productType == null)
+                    {
+                        Console.WriteLine("Invalid Product Type chosen.");
+                    }
                 }
+                else if(action == ActionType.UpdateInventory)
+                {
+                    Console.WriteLine("--- Updating Inventory ---");
+                }
+                /* End Employee Only Actions */
 
                 Console.WriteLine("\n");
             }
@@ -170,7 +232,7 @@ namespace CIS_Proj
                 Console.WriteLine($"{i++} - {lt}");
 
             }
-            _ = int.TryParse(Console.ReadLine() ?? "0", out int selection);
+            _ = int.TryParse(Console.ReadLine() ?? "-1", out int selection);
 
             if (selection >= Enum.GetNames(typeof(LoginType)).Length || selection < 0)
                 selection = 0;
@@ -205,48 +267,65 @@ namespace CIS_Proj
             return (ActionType)selection;
         }
 
-        public static void FillQuantityItem(ProductByQuantity? item)
+        public static ProductType? SelectProductType()
         {
-            if(item == null)
+            Console.WriteLine("--- Select Product Type ---");
+            int i = 0;
+            foreach (var productType in (ProductType[])Enum.GetValues(typeof(ProductType)))
+            {
+                Console.WriteLine($"{i++} - {productType}");
+            }
+            _ = int.TryParse(Console.ReadLine() ?? "-1", out int selection);
+
+            if (selection >= Enum.GetNames(typeof(ProductType)).Length || selection < 0)
+                return null;
+
+            return (ProductType)selection;
+        }
+        public static void FillQuantityProduct(ProductByQuantity product)
+        {
+            if (product == null)
             {
                 return;
             }
 
             Console.Write("Item name: ");
-            item.Name = Console.ReadLine() ?? string.Empty;
+            product.Name = Console.ReadLine() ?? string.Empty;
 
             Console.Write("Item Description: ");
-            item.Description = Console.ReadLine() ?? string.Empty;
+            product.Description = Console.ReadLine() ?? string.Empty;
 
-            Console.Write("Item price: ");
-            // Discard variable _ indicates that we do not need the result
-            // of the function.
-            _ = decimal.TryParse(Console.ReadLine(), out decimal price);
-            item.Price = price;
+            Console.Write("Item price: $");
+            _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal price);
+            product.Price = price;
 
             Console.Write("Item quantity: ");
-            _ = int.TryParse(Console.ReadLine(), out int quantity);
-            item.Quantity = quantity;
+            _ = int.TryParse(Console.ReadLine() ?? "0", out int quantity);
+            product.Quantity = quantity;
         }
 
-        public static bool FillIdAndQuantity(ProductByQuantity newItem)
+        public static void FillWeightProduct(ProductByWeight product)
         {
-            Console.Write("Item number:  ");
-            _ = int.TryParse(Console.ReadLine() ?? "0", out int itemId);
-            newItem.Id = itemId;
-
-            Console.Write("Item Quantity:  ");
-            _ = int.TryParse(Console.ReadLine() ?? "0", out int quant);
-            newItem.Quantity = quant;
-
-            if (quant <= 0)
+            if (product == null)
             {
-                Console.WriteLine("Quantity must be greater than 0");
-                return false;
+                return;
             }
 
-            return true;
+            Console.Write("Item name: ");
+            product.Name = Console.ReadLine() ?? string.Empty;
+
+            Console.Write("Item Description: ");
+            product.Description = Console.ReadLine() ?? string.Empty;
+
+            Console.Write("Item price per lb: $");
+            _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal price);
+            product.Price = price;
+
+            Console.Write("Item weight: ");
+            _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal weight);
+            product.Weight = weight;
         }
+
 
         public static bool Checkout(CartService cartService)
         {
@@ -272,7 +351,7 @@ namespace CIS_Proj
             }
         }
 
-        public static List<string> ListEnum(Enum myEnum)
+        public static List<string> EnumToList(Enum myEnum)
         {
             List<string> list = new List<string>();
             int i = 0;

@@ -1,10 +1,17 @@
 ﻿using System;
 using Library.CIS_Proj.Models;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Library.CIS_Proj.Utilities;
+
 namespace Library.CIS_Proj.Services
 {
 	public class InventoryService
 	{
+        private ListNavigator<Product> listNavigator;
 		private CartService? cartService;
 		public CartService CartService
         {
@@ -42,9 +49,10 @@ namespace Library.CIS_Proj.Services
             }
         }
         
-		public InventoryService()
+		private InventoryService()
 		{
             productList = new List<Product>();
+            listNavigator = new ListNavigator<Product>(productList);
 		}
 
         public int NextId
@@ -63,6 +71,11 @@ namespace Library.CIS_Proj.Services
         /* CRUD methods */
         public bool Create(Product product)
         {
+            if (product == null)
+            {
+                return false;
+            }
+            
             product.Id = NextId;
             Products.Add(product);
             return true;
@@ -99,28 +112,75 @@ namespace Library.CIS_Proj.Services
             return false;
         }
 
-        public bool Save(string filename)
+        public bool Save(string filename = "inventory.json")
         {
-            var inventoryJson = JsonConvert.SerializeObject(productList);
+            var options = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All
+            };
+            var inventoryJson = JsonConvert.SerializeObject(productList, options);
             File.WriteAllText(filename, inventoryJson);
             return true;
         }
 
-        public bool Load(string filename)
+        public bool Load(string filename = "inventory.json")
         {
+            var options = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All
+            };
             var inventoryJson = File.ReadAllText(filename);
-            productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson) ?? new List<Product>();
+            productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
+            listNavigator = new ListNavigator<Product>(productList);
             return true;
         }
 
-        public void List()
+        public void List(int choice = 0)
         {
-            foreach (Product product in Products)
+            string sortBy;
+            switch (choice)
+            {
+                case 1: sortBy = "Name"; break;
+                case 2: sortBy = "Price"; break;
+                case 0:
+                default: sortBy = "Id"; break;
+            }
+            
+            if(sortBy.Equals("Id"))
+            {
+                foreach (Product product in Products)
+                {
+                    Console.WriteLine(product);
+                    //Console.WriteLine("Debugging: " + product.GetType());
+                }
+            }
+            else if (sortBy.Equals("Name"))
+            {
+                foreach (Product product in Products.OrderBy(t => t.Name))
+                {
+                    Console.WriteLine(product);
+                    //Console.WriteLine("Debugging: " + product.GetType());
+                }
+            }
+            else if (sortBy.Equals("Price"))
+            {
+                foreach (Product product in Products.OrderBy(t => t.Price))
+                {
+                    Console.WriteLine(product);
+                    //Console.WriteLine("Debugging: " + product.GetType());
+                }
+            }
+        }
+
+        public void NavigateList()
+        {
+            var listWindow = listNavigator.GetCurrentPage();
+            foreach (var product in listWindow)
             {
                 Console.WriteLine(product);
             }
         }
-
+        
         public List<Product> Search(string term)
         {
             List<Product> foundProducts = new List<Product>();

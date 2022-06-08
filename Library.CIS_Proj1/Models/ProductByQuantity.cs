@@ -9,7 +9,7 @@ namespace Library.CIS_Proj.Models
     public partial class ProductByQuantity : Product
     {
         public int Quantity { get; set; }
-        public decimal TotalPrice 
+        public new decimal TotalPrice 
         { 
             get
             {
@@ -23,11 +23,17 @@ namespace Library.CIS_Proj.Models
             Description = string.Empty;
             Price = 0;
             Quantity = 0;
+            isBogo = false;
         }
 
         public override string ToString()
         {
-            return $"{Id} - {Name}: {Description}. ${Price} x {Quantity} = ${TotalPrice}";
+            return $"{Id} - {Name}: {Description}. ${Price} x {Quantity} = ${TotalPrice} {(isBogo ? "BOGO" : "")}";
+        }
+
+        public new ProductByQuantity Clone()
+        {
+            return (ProductByQuantity)this.MemberwiseClone();
         }
     }
 }

@@ -1,10 +1,17 @@
 ﻿using System;
 using Library.CIS_Proj.Models;
+using Library.CIS_Proj.Utilities;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Library.CIS_Proj.Services
 {
 	public class CartService
 	{
+        private ListNavigator<Product> listNavigator;
 		private InventoryService? inventoryService;
 		public InventoryService InventoryService
 		{
@@ -42,10 +49,11 @@ namespace Library.CIS_Proj.Services
             }
         }
 
-		public CartService()
+		private CartService()
 		{
 			productList = new List<Product>();
-		}
+            listNavigator = new ListNavigator<Product>(productList);
+        }
 
         public int NextId
         {
@@ -61,53 +69,84 @@ namespace Library.CIS_Proj.Services
         }
 
         /* CRUD methods */
-        public bool Create(ProductByQuantity product)
+        public bool AddToCart(Product product)
         {
-            if(product.Quantity <= 0)
-            {
-                Console.WriteLine("Invalid quantity supplied.");
+            if (product == null)
                 return false;
-            }
             
-            foreach(ProductByQuantity p in InventoryService.Products)
+            if (product is ProductByWeight)
             {
-                if(p.Id == product.Id)
+                if (((ProductByWeight)product).Weight <= 0)
                 {
-                    Console.WriteLine("found matching product");
-                    if(product.Quantity > p.Quantity)
-                    {
-                        Console.WriteLine("Quantity requested is greater than supply. Adding all to cart.");
-                        product.Quantity = p.Quantity;
-                    }
-                    if(product.Quantity == 0)
-                    {
-                        Console.WriteLine("No available supply. Nothing added to cart");
-                        return false;
-                    }
-
-                    Console.WriteLine("Quantity subtracted from inventory. Added to cart");
-                    p.Quantity -= product.Quantity;
-                    ProductByQuantity newProduct = ((ProductByQuantity) p.Clone()) ;
-                    newProduct.Quantity = product.Quantity;
-
-                    foreach(Product p2 in Products)
-                    {
-                        if(p2.Id == newProduct.Id)
-                        {
-                            Console.WriteLine("Product is already in cart. Updating cart quantity.");
-                            ((ProductByQuantity) p2).Quantity += newProduct.Quantity;
-                            return true;
-                        }
-                    }
-
-                    Products.Add(newProduct); 
-                    return true;
+                    Console.WriteLine("Invalid weight");
+                    return false;
+                }
+            }
+            else if (product is ProductByQuantity)
+            {
+                if (((ProductByQuantity)product).Quantity <= 0)
+                {
+                    Console.WriteLine("Invalid quantity");
+                    return false;
                 }
             }
 
-            Console.WriteLine("No product found. Nothing added to cart.");
-            return false;
+            // Since we know product exists in inventory, we just have to subtract the quantity/ weight from the inventory item
+
+            if (product is ProductByWeight)
+            {
+                ProductByWeight productByWeight = (ProductByWeight)product;
+                ProductByWeight inventoryProductByWeight = (ProductByWeight)InventoryService.Products.Where(t => t.Id == productByWeight.Id).First();
+                if (inventoryProductByWeight.Weight < productByWeight.Weight)
+                {
+                    Console.WriteLine("Not enough weight in inventory. Nothing added to cart.");
+                    return false;
+                }
+                else
+                {
+                    inventoryProductByWeight.Weight -= productByWeight.Weight;
+                }
+            }
+            else if (product is ProductByQuantity)
+            {
+                ProductByQuantity productByQuantity = (ProductByQuantity)product;
+                ProductByQuantity inventoryProductByQuantity = (ProductByQuantity)InventoryService.Products.Where(t => t.Id == productByQuantity.Id).First();
+                if (inventoryProductByQuantity.Quantity < productByQuantity.Quantity)
+                {
+                    Console.WriteLine("Not enough quantity in inventory. Nothing added to cart.");
+                    return false;
+                }
+                else
+                {
+                    inventoryProductByQuantity.Quantity -= productByQuantity.Quantity;
+                }
+            }
+            var cartProduct = Products.Find(t => t.Id == product.Id);
+            if (cartProduct == null)
+            {
+                product.Id = NextId;
+                Products.Add(product);
+                Console.WriteLine("New product added successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Product already exists in cart.");
+                if (product is ProductByWeight)
+                {
+                    Console.WriteLine("Updating weight.");
+                    ((ProductByWeight)cartProduct).Weight += ((ProductByWeight)product).Weight;
+                }
+                else if (product is ProductByQuantity)
+                {
+                    Console.WriteLine("Updating quantity.");
+                    ((ProductByQuantity)cartProduct).Quantity += ((ProductByQuantity)product).Quantity;
+                }
+
+            }
+
+            return true;
         }
+        
 
         public bool Delete(Product product)
         {
@@ -147,23 +186,70 @@ namespace Library.CIS_Proj.Services
             return false;
         }
 
-        public bool Save(string filename)
+        public bool Save(string filename = "cart.json")
         {
-            var cartJson = JsonConvert.SerializeObject(productList);
+            var options = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All
+            };
+            var cartJson = JsonConvert.SerializeObject(productList, options);
             File.WriteAllText(filename, cartJson);
             return true;
         }
 
-        public bool Load(string filename)
+        public bool Load(string filename = "cart.json")
         {
+            var options = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All
+            };
             var cartJson = File.ReadAllText(filename);
-            productList = JsonConvert.DeserializeObject<List<Product>>(cartJson) ?? new List<Product>();
+            productList = JsonConvert.DeserializeObject<List<Product>>(cartJson, options) ?? new List<Product>();
+            listNavigator = new ListNavigator<Product>(productList);
             return true;
         }
 
-        public void List()
+        public void List(int choice = 0)
         {
-            foreach(Product product in Products)
+            string sortBy;
+            switch (choice)
+            {
+                case 1: sortBy = "Name"; break;
+                case 2: sortBy = "TotalPrice"; break;
+                case 0:
+                default: sortBy = "Id"; break;
+            }
+
+            if (sortBy.Equals("Id"))
+            {
+                foreach (Product product in Products)
+                {
+                    Console.WriteLine(product);
+                    //Console.WriteLine("Debugging: " + product.GetType());
+                }
+            }
+            else if (sortBy.Equals("Name"))
+            {
+                foreach (Product product in Products.OrderBy(t => t.Name))
+                {
+                    Console.WriteLine(product);
+                    //Console.WriteLine("Debugging: " + product.GetType());
+                }
+            }
+            else if (sortBy.Equals("TotalPrice"))
+            {
+                foreach (Product product in Products.OrderBy(t => t.TotalPrice))
+                {
+                    Console.WriteLine(product);
+                    //Console.WriteLine("Debugging: " + product.GetType());
+                }
+            }
+        }
+
+        public void NavigateList()
+        {
+            var listWindow = listNavigator.GetCurrentPage();
+            foreach (var product in listWindow)
             {
                 Console.WriteLine(product);
             }
