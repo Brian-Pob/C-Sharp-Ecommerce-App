@@ -140,6 +140,10 @@ namespace CIS_Proj
                             Console.WriteLine(item);
                         }
                     }
+
+                    /* TODO */
+                    // Implement pagination in Search
+                    // Implement Sorting in search
                 }
                 else if (action == ActionType.Save)
                 {
