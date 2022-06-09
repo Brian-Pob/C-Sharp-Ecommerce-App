@@ -12,7 +12,14 @@ namespace Library.CIS_Proj.Services
 	public class InventoryService
 	{
         private ListNavigator<Product> listNavigator;
-		private CartService? cartService;
+        public ListNavigator<Product> ListNavigator
+        {
+            get
+            {
+                return listNavigator;
+            }
+        }
+        private CartService? cartService;
 		public CartService CartService
         {
 			get
@@ -52,7 +59,7 @@ namespace Library.CIS_Proj.Services
 		private InventoryService()
 		{
             productList = new List<Product>();
-            listNavigator = new ListNavigator<Product>(productList);
+            listNavigator = new ListNavigator<Product>(SortedList);
 		}
 
         public int NextId
@@ -131,69 +138,82 @@ namespace Library.CIS_Proj.Services
             };
             var inventoryJson = File.ReadAllText(filename);
             productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
-            listNavigator = new ListNavigator<Product>(productList);
+            listNavigator = new ListNavigator<Product>(SortedList);
             return true;
         }
 
-        public void List(int choice = 0)
+        private int _sortBy;
+        public int SortBy
         {
-            string sortBy;
-            switch (choice)
+            get
             {
-                case 1: sortBy = "Name"; break;
-                case 2: sortBy = "Price"; break;
-                case 0:
-                default: sortBy = "Id"; break;
+                return _sortBy;
             }
-            
-            if(sortBy.Equals("Id"))
+
+            set
             {
-                foreach (Product product in Products)
-                {
-                    Console.WriteLine(product);
-                    //Console.WriteLine("Debugging: " + product.GetType());
-                }
+                _sortBy = value;
+                listNavigator = new ListNavigator<Product>(SortedList);
             }
-            else if (sortBy.Equals("Name"))
+        }
+        public IEnumerable<Product> SortedList
+        {
+            get
             {
-                foreach (Product product in Products.OrderBy(t => t.Name))
+                switch (SortBy)
                 {
-                    Console.WriteLine(product);
-                    //Console.WriteLine("Debugging: " + product.GetType());
-                }
-            }
-            else if (sortBy.Equals("Price"))
-            {
-                foreach (Product product in Products.OrderBy(t => t.Price))
-                {
-                    Console.WriteLine(product);
-                    //Console.WriteLine("Debugging: " + product.GetType());
+                    case 1:
+                        return (Products.OrderBy(t => t.Name));
+                    case 2:
+                        return (Products.OrderBy(t => t.Price));
+                    case 0:
+                    default:
+                        return (Products.OrderBy(t => t.Id));
                 }
             }
         }
 
-        public void NavigateList()
+        private string searchTerm;
+        private ListNavigator<Product> searchListNavigator;
+        public ListNavigator<Product> SearchListNavigator
         {
-            var listWindow = listNavigator.GetCurrentPage();
-            foreach (var product in listWindow)
+            get
             {
-                Console.WriteLine(product);
+                return searchListNavigator;
             }
         }
-        
-        public List<Product> Search(string term)
+        public IEnumerable<Product> Search(string term)
         {
-            List<Product> foundProducts = new List<Product>();
-            foreach(Product product in Products)
+            IEnumerable<Product> foundProducts;
+
+            if (!string.IsNullOrEmpty(term))
             {
-                if(product.Name.ToLower().Contains(term.ToLower()) || product.Description.ToLower().Contains(term.ToLower()))
-                {
-                    foundProducts.Add(product.Clone());
-                }
+                searchTerm = term;
             }
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                foundProducts = Products.Where(t => t.Name.ToLower().Contains(searchTerm.ToLower()));
+                var temp = foundProducts;
+                foundProducts = foundProducts.Concat(Products.Where(t => t.Description.ToLower().Contains(searchTerm.ToLower()) && !temp.Contains(t)));
+            }
+            else
+            {
+                foundProducts = Products;
+            }
+
+            switch (SortBy)
+            {
+                case 1:
+                    foundProducts = (foundProducts.OrderBy(t => t.Name)); break;
+                case 2:
+                    foundProducts = (foundProducts.OrderBy(t => t.Price)); break;
+                case 0:
+                default:
+                    foundProducts = (foundProducts.OrderBy(t => t.Id)); break;
+            }
+            searchListNavigator = new ListNavigator<Product>(foundProducts);
             return foundProducts;
         }
-
-        
     }
 }

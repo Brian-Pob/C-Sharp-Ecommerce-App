@@ -36,13 +36,13 @@ namespace Library.CIS_Proj.Models
             Description = string.Empty;
             Price = 0;
             Weight = 0;
-            isBogo = false;
+            IsBogo = false;
         }
 
         public override string ToString()
         {
            
-            return $"{Id} - {Name}: {Description}. ${Price}/lb x {Weight}lbs = ${TotalPrice} {(isBogo ? "BOGO" : "")}";
+            return $"{Id} - {Name}: {Description}. ${Price}/lb x {Weight}lbs = ${TotalPrice} {(IsBogo ? "BOGO" : "")}";
         }
 
         public new ProductByWeight Clone()

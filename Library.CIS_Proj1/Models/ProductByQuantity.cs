@@ -23,12 +23,12 @@ namespace Library.CIS_Proj.Models
             Description = string.Empty;
             Price = 0;
             Quantity = 0;
-            isBogo = false;
+            IsBogo = false;
         }
 
         public override string ToString()
         {
-            return $"{Id} - {Name}: {Description}. ${Price} x {Quantity} = ${TotalPrice} {(isBogo ? "BOGO" : "")}";
+            return $"{Id} - {Name}: {Description}. ${Price} x {Quantity} = ${TotalPrice} {(IsBogo ? "BOGO" : "")}";
         }
 
         public new ProductByQuantity Clone()

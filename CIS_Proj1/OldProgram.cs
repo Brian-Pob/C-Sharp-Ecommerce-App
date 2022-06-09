@@ -60,16 +60,16 @@ namespace CIS_Proj
                 if (action == ActionType.ListInventory)
                 {
                     Console.WriteLine("Listing Inventory");
-                    inventoryService.List();
+                    //inventoryService.List();
                 }
                 else if (action == ActionType.SearchInventory)
                 {
                     Console.WriteLine("Searching Inventory");
                     Console.Write("Enter term to search for:  ");
                     string term = Console.ReadLine() ?? "";
-                    List<Product> foundItems = inventoryService.Search(term);
+                    var foundItems = inventoryService.Search(term);
 
-                    if (foundItems.Count == 0)
+                    if (foundItems.Count() == 0)
                     {
                         Console.WriteLine($"No items found in inventory with {term} in name or description.");
                     }
@@ -109,20 +109,20 @@ namespace CIS_Proj
                     Console.WriteLine("Searching Cart");
                     Console.Write("Enter term to search for:  ");
                     string term = Console.ReadLine() ?? "";
-                    List<Product> foundItems = cartService.Search(term);
+                    //List<Product> foundItems = cartService.Search(term);
 
-                    if (foundItems.Count == 0)
-                    {
-                        Console.WriteLine($"No items found in cart with {term} in name or description.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Found items:  ");
-                        foreach (Product item in foundItems)
-                        {
-                            Console.WriteLine(item);
-                        }
-                    }
+                    //if (foundItems.Count == 0)
+                    //{
+                    //    Console.WriteLine($"No items found in cart with {term} in name or description.");
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine("Found items:  ");
+                    //    foreach (Product item in foundItems)
+                    //    {
+                    //        Console.WriteLine(item);
+                    //    }
+                    //}
                 }
                 else if (action == ActionType.Save)
                 {

@@ -12,6 +12,13 @@ namespace Library.CIS_Proj.Services
 	public class CartService
 	{
         private ListNavigator<Product> listNavigator;
+        public ListNavigator<Product> ListNavigator
+        {
+            get
+            {
+                return listNavigator;
+            }
+        }
 		private InventoryService? inventoryService;
 		public InventoryService InventoryService
 		{
@@ -124,7 +131,6 @@ namespace Library.CIS_Proj.Services
             var cartProduct = Products.Find(t => t.Id == product.Id);
             if (cartProduct == null)
             {
-                product.Id = NextId;
                 Products.Add(product);
                 Console.WriteLine("New product added successfully.");
             }
@@ -141,49 +147,88 @@ namespace Library.CIS_Proj.Services
                     Console.WriteLine("Updating quantity.");
                     ((ProductByQuantity)cartProduct).Quantity += ((ProductByQuantity)product).Quantity;
                 }
-
+            }
+            try
+            {
+                Console.WriteLine("Debug: " + cartProduct);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Debug: " + e.Message);
             }
 
             return true;
         }
         
-
+        /*
+         * Expected input: Product with Id exists in cart but quantity may not be valid.
+         */
         public bool Delete(Product product)
         {
-            foreach(Product p in Products)
+            var cartProduct = Products.Find(t => t.Id == product.Id);
+            if (cartProduct == null)
             {
-                if(p.Id == product.Id)
+                Console.WriteLine("Product not found in cart.");
+                return false;
+            }
+            else
+            {
+                // Check if quantity/ weight is valid
+                
+                if (product is ProductByWeight)
                 {
-                    Console.WriteLine("Found product in cart");
-                    //if(p.Quantity < product.Quantity)
-                    //{
-                    //    Console.WriteLine("Qty to be removed exceeds existing qty. Removing all from cart.");
-                    //    product.Quantity = p.Quantity;
-                    //}
+                    if (((ProductByWeight)product).Weight <= 0)
+                    {
+                        Console.WriteLine("Invalid weight. Nothing deleted from cart.");
+                        return false;
+                    }
+                    else if (((ProductByWeight)cartProduct).Weight < ((ProductByWeight)product).Weight)
+                    {
+                        Console.WriteLine("Not enough weight in cart. Nothing deleted.");
+                        return false;
+                    }
+                    
 
-                    //p.Quantity -= product.Quantity;
-                    //if(p.Quantity == 0)
-                    //{
-                    //    Console.WriteLine("Cart product quantity is 0. Product completely removed from cart.");
-                    //    Products.Remove(p);
-                    //}
+                    Console.WriteLine("Updating weight in cart.");
+                    ((ProductByWeight)cartProduct).Weight -= ((ProductByWeight)product).Weight;
+                    if (((ProductByWeight)cartProduct).Weight == 0)
+                    {
+                        Console.WriteLine("Weight is 0. Deleting product from cart.");
+                        Products.Remove(cartProduct);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Weight of {cartProduct.Name} in cart is now {((ProductByWeight)cartProduct).Weight}.");
+                    }
+                }
+                else if (product is ProductByQuantity)
+                {
+                    if (((ProductByQuantity)product).Quantity <= 0)
+                    {
+                        Console.WriteLine("Invalid quantity. Nothing deleted from cart.");
+                        return false;
+                    }
+                    else if (((ProductByQuantity)cartProduct).Quantity < ((ProductByQuantity)product).Quantity)
+                    {
+                        Console.WriteLine("Not enough quantity in cart. Nothing deleted.");
+                        return false;
+                    }
+                    
+                    Console.WriteLine("Updating quantity in cart.");
+                    ((ProductByQuantity)cartProduct).Quantity -= ((ProductByQuantity)product).Quantity;
+                    if (((ProductByQuantity)cartProduct).Quantity == 0)
+                    {
+                        Console.WriteLine("Quantity is 0. Deleting product from cart.");
+                        Products.Remove(cartProduct);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Quantity of {cartProduct.Name} in cart is now {((ProductByQuantity)cartProduct).Quantity}.");
+                    }
 
-                    //foreach(Product p2 in inventoryService.Products)
-                    //{
-                    //    if(p2.Id == product.Id)
-                    //    {
-                    //        Console.WriteLine("Updating inventory qty");
-                    //        p2.Quantity += product.Quantity;
-                    //        break;
-                    //    }
-                    //}
-
-                    Console.WriteLine("Product qty removed from cart.");
-                    return true;
                 }
             }
-            Console.WriteLine("Product not found in cart.");
-            return false;
+            return true;
         }
 
         public bool Save(string filename = "cart.json")
@@ -255,19 +300,6 @@ namespace Library.CIS_Proj.Services
             }
         }
 
-        public List<Product> Search(string term)
-        {
-            List<Product> foundProducts = new List<Product>();
-            foreach (Product product in Products)
-            {
-                if (product.Name.ToLower().Contains(term.ToLower()) || product.Description.ToLower().Contains(term.ToLower()))
-                {
-                    foundProducts.Add(product.Clone());
-                }
-            }
-            return foundProducts;
-        }
-
         public decimal GetTotal()
         {
             decimal total = 0;
@@ -279,6 +311,80 @@ namespace Library.CIS_Proj.Services
             return total;
         }
 
-        
+        private int _sortBy;
+        public int SortBy
+        {
+            get
+            {
+                return _sortBy;
+            }
+
+            set
+            {
+                _sortBy = value;
+                listNavigator = new ListNavigator<Product>(SortedList);
+            }
+        }
+        public IEnumerable<Product> SortedList
+        {
+            get
+            {
+                switch (SortBy)
+                {
+                    case 1:
+                        return (Products.OrderBy(t => t.Name));
+                    case 2:
+                        return (Products.OrderBy(t => t.Price));
+                    case 0:
+                    default:
+                        return (Products.OrderBy(t => t.Id));
+                }
+            }
+        }
+
+        private string searchTerm;
+        private ListNavigator<Product> searchListNavigator;
+        public ListNavigator<Product> SearchListNavigator
+        {
+            get
+            {
+                return searchListNavigator;
+            }
+        }
+        public IEnumerable<Product> Search(string term)
+        {
+            IEnumerable<Product> foundProducts;
+
+            if (!string.IsNullOrEmpty(term))
+            {
+                searchTerm = term;
+            }
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                foundProducts = Products.Where(t => t.Name.ToLower().Contains(searchTerm.ToLower()));
+                var temp = foundProducts;
+                foundProducts = foundProducts.Concat(Products.Where(t => t.Description.ToLower().Contains(searchTerm.ToLower()) && !temp.Contains(t)));
+            }
+            else
+            {
+                foundProducts = Products;
+            }
+
+            switch (SortBy)
+            {
+                case 1:
+                    foundProducts = (foundProducts.OrderBy(t => t.Name)); break;
+                case 2:
+                    foundProducts = (foundProducts.OrderBy(t => t.Price)); break;
+                case 0:
+                default:
+                    foundProducts = (foundProducts.OrderBy(t => t.Id)); break;
+            }
+            searchListNavigator = new ListNavigator<Product>(foundProducts);
+            return foundProducts;
+        }
+
+
     }
 }
