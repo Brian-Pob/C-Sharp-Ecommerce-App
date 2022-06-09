@@ -148,14 +148,6 @@ namespace Library.CIS_Proj.Services
                     ((ProductByQuantity)cartProduct).Quantity += ((ProductByQuantity)product).Quantity;
                 }
             }
-            try
-            {
-                Console.WriteLine("Debug: " + cartProduct);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Debug: " + e.Message);
-            }
 
             return true;
         }
@@ -323,6 +315,7 @@ namespace Library.CIS_Proj.Services
             {
                 _sortBy = value;
                 listNavigator = new ListNavigator<Product>(SortedList);
+                var listCopy = new List<Product>(SortedList);
             }
         }
         public IEnumerable<Product> SortedList
@@ -334,7 +327,7 @@ namespace Library.CIS_Proj.Services
                     case 1:
                         return (Products.OrderBy(t => t.Name));
                     case 2:
-                        return (Products.OrderBy(t => t.Price));
+                        return (Products.OrderBy(i => (i as ProductByQuantity)?.TotalPrice ?? (i as ProductByWeight)?.TotalPrice));
                     case 0:
                     default:
                         return (Products.OrderBy(t => t.Id));
@@ -376,11 +369,12 @@ namespace Library.CIS_Proj.Services
                 case 1:
                     foundProducts = (foundProducts.OrderBy(t => t.Name)); break;
                 case 2:
-                    foundProducts = (foundProducts.OrderBy(t => t.Price)); break;
+                    foundProducts = (foundProducts.OrderBy(i => (i as ProductByQuantity)?.TotalPrice ?? (i as ProductByWeight)?.TotalPrice)); break;
                 case 0:
                 default:
                     foundProducts = (foundProducts.OrderBy(t => t.Id)); break;
             }
+            
             searchListNavigator = new ListNavigator<Product>(foundProducts);
             return foundProducts;
         }

@@ -207,7 +207,7 @@ namespace CIS_Proj
                     Console.WriteLine("Sort By: ");
                     Console.WriteLine("0 - Id (Default)");
                     Console.WriteLine("1 - Name");
-                    Console.WriteLine("2 - Unit Price");
+                    Console.WriteLine("2 - Total Price");
 
                     _ = int.TryParse(Console.ReadLine() ?? "0", out int sortBy);
                     cartService.SortBy = sortBy;
@@ -274,7 +274,9 @@ namespace CIS_Proj
                     else
                     {
                         product = product.Clone();
-                        Console.WriteLine($"Deleting {product.Name} from cart.");
+                        Console.WriteLine($"Deleting {product.Name} from cart. " +
+                            $"You have {(product as ProductByQuantity)?.Quantity ?? (product as ProductByWeight)?.Weight}" +
+                            $"{(product is ProductByWeight ? " lbs" : "")} in your cart.");
                         if (product is ProductByQuantity)
                         {
                             Console.Write("Enter quantity to delete from cart: ");
@@ -307,7 +309,7 @@ namespace CIS_Proj
                     Console.WriteLine("Sort By: ");
                     Console.WriteLine("0 - Id (Default)");
                     Console.WriteLine("1 - Name");
-                    Console.WriteLine("2 - Unit Price");
+                    Console.WriteLine("2 - Total Price");
 
                     _ = int.TryParse(Console.ReadLine() ?? "0", out int sortBy);
 
@@ -363,10 +365,6 @@ namespace CIS_Proj
                         }
                         else { Console.WriteLine("Invalid Input"); }
                     }
-
-                    /* TODO */
-                    // Implement pagination in Search
-                    // Implement Sorting in search
                 }
                 else if (action == ActionType.Save)
                 {
@@ -399,13 +397,13 @@ namespace CIS_Proj
                 /* Employee Only Actions */
                 if (login != LoginType.Employee)
                     continue;
-                
+
                 if (action == ActionType.AddToInventory)
                 {
                     Product newProduct;
                     Console.WriteLine("--- Adding to Inventory ---");
                     var productType = SelectProductType();
-                    if(productType == ProductType.Quantity)
+                    if (productType == ProductType.Quantity)
                     {
                         Console.WriteLine("--- Adding Product By Quantity ---");
                         newProduct = new ProductByQuantity();
@@ -419,7 +417,7 @@ namespace CIS_Proj
                             Console.WriteLine("Product could not be added.");
                         }
                     }
-                    else if(productType == ProductType.Weight)
+                    else if (productType == ProductType.Weight)
                     {
                         Console.WriteLine("--- Adding Product By Weight ---");
                         newProduct = new ProductByWeight();
@@ -433,14 +431,104 @@ namespace CIS_Proj
                             Console.WriteLine("Product could not be added.");
                         }
                     }
-                    else if(productType == null)
+                    else if (productType == null)
                     {
                         Console.WriteLine("Invalid Product Type chosen.");
                     }
                 }
-                else if(action == ActionType.UpdateInventory)
+                else if (action == ActionType.UpdateInventory)
                 {
                     Console.WriteLine("--- Updating Inventory ---");
+                    Console.Write("Enter Product Id to update: ");
+                    _ = int.TryParse(Console.ReadLine() ?? "0", out int id);
+                    var product = inventoryService.Products.FirstOrDefault(p => p.Id == id);
+                    if (product == null)
+                    {
+                        Console.WriteLine("Product not found.");
+                        continue;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Updating {product.Name}");
+                        product = product.Clone();
+                    }
+                    
+                    if (product is ProductByQuantity)
+                    {
+                        Console.Write("Enter quantity to update: ");
+                        _ = int.TryParse(Console.ReadLine() ?? "0", out int quantity);
+                        if (quantity < 0)
+                        {
+                            Console.WriteLine("Quantity cannot be negative.");
+                            continue;
+                        }
+                        ((ProductByQuantity)product).Quantity = quantity;
+                    }
+                    else if (product is ProductByWeight)
+                    {
+                        Console.Write("Enter weight to update: ");
+                        _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal weight);
+                        if (weight < 0)
+                        {
+                            Console.WriteLine("Weight cannot be negative.");
+                            continue;
+                        }
+                        ((ProductByWeight)product).Weight = weight;
+                    }
+
+                    Console.Write("Update other details (name, desc, price, BOGO status)? (y/n): ");
+                    var input = Console.ReadLine() ?? "";
+                    if (input.ToLower() == "y")
+                    {
+                        Console.Write("Enter name: ");
+                        product.Name = Console.ReadLine() ?? "";
+                        Console.Write("Enter description: ");
+                        product.Description = Console.ReadLine() ?? "";
+                        Console.Write("Enter price");
+                        _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal price);
+                        if (price < 0)
+                        {
+                            Console.WriteLine("Price cannot be negative.");
+                            continue;
+                        }
+
+                        product.Price = price;
+                        Console.Write("Enter BOGO status (y/n): ");
+                        input = Console.ReadLine() ?? "";
+                        if (input.ToLower() == "y")
+                        {
+                            product.IsBogo = true;
+                        }
+                        else if (input.ToLower() == "n")
+                        {
+                            product.IsBogo = false;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid input.");
+                            continue;
+                        }
+
+                        Console.WriteLine("New product details:");
+                        Console.WriteLine(product);
+                        Console.Write("Confirm update? (y/n): ");
+                        input = Console.ReadLine() ?? "";
+                        if (input.ToLower() != "y")
+                        {
+                            Console.WriteLine("Update cancelled. No changes made.");
+                            continue;
+                        }
+
+                        if (inventoryService.Update(product))
+                        {
+                            Console.WriteLine("Product updated successfully.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Product could not be updated.");
+                        }
+                    }
+
                 }
                 /* End Employee Only Actions */
 
@@ -529,6 +617,10 @@ namespace CIS_Proj
             Console.Write("Item quantity: ");
             _ = int.TryParse(Console.ReadLine() ?? "0", out int quantity);
             product.Quantity = quantity;
+
+            Console.Write("BOGO deal? (y/n): ");
+            var input = Console.ReadLine() ?? "";
+            (product as ProductByQuantity).IsBogo = input.ToLower() == "y";
         }
 
         public static void FillWeightProduct(ProductByWeight product)
@@ -551,6 +643,10 @@ namespace CIS_Proj
             Console.Write("Item weight: ");
             _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal weight);
             product.Weight = weight;
+
+            Console.Write("BOGO deal? (y/n): ");
+            var input = Console.ReadLine() ?? "";
+            (product as ProductByWeight).IsBogo = input.ToLower() == "y";
         }
 
 
@@ -563,7 +659,10 @@ namespace CIS_Proj
             Console.WriteLine("Subtotal:  $" + total);
             Console.WriteLine("7.5% Sales Tax:  $" + Decimal.Round((total * (decimal)salesTax), 2));
             Console.WriteLine("Total:  $" + Decimal.Round((total + total * (decimal)salesTax), 2));
-            Console.Write("Confirm checkout? (Y/n):  ");
+            Console.Write("Enter billing information: ");
+            Console.ReadLine();
+
+            Console.Write("\nConfirm checkout? (y/n): ");
             var input = Console.ReadLine() ?? "n";
             if(input.ToLower() == "y")
             {

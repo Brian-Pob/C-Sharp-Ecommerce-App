@@ -31,7 +31,7 @@ namespace Library.CIS_Proj.Models
 			return (Product)this.MemberwiseClone();
 		}
 
-		public decimal TotalPrice { get; }
+		public virtual decimal TotalPrice { get { return -1; } }
 
         
 	}

@@ -13,6 +13,10 @@ namespace Library.CIS_Proj.Models
         { 
             get
             {
+                if (IsBogo)
+                {
+                    return (Quantity / 2 + Quantity % 2) * Price;
+                }
                 return Quantity * Price;
             }
         }

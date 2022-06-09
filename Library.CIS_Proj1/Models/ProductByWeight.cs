@@ -26,6 +26,11 @@ namespace Library.CIS_Proj.Models
         {
             get
             {
+                if (IsBogo)
+                {
+                    return Decimal.Round((Decimal.Truncate(Weight / 2) + Weight % 2) * Price, 2);
+                }
+
                 return Decimal.Round(Weight * Price, 2);
             }
         }
