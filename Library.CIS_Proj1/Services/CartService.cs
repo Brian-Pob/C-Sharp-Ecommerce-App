@@ -297,7 +297,7 @@ namespace Library.CIS_Proj.Services
             decimal total = 0;
             foreach(Product product in Products)
             {
-                total += product.TotalPrice;
+                total += (product is ProductByWeight ? (product as ProductByWeight).TotalPrice : (product as ProductByQuantity).TotalPrice);
             }
 
             return total;

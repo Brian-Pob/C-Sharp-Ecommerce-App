@@ -39,8 +39,8 @@ namespace Library.CIS_Proj.Models
         {
             Name = string.Empty;
             Description = string.Empty;
-            Price = 0;
-            Weight = 0;
+            Price = -1;
+            Weight = -1;
             IsBogo = false;
         }
 

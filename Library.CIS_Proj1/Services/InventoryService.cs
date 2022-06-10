@@ -78,7 +78,8 @@ namespace Library.CIS_Proj.Services
         /* CRUD methods */
         public bool Create(Product product)
         {
-            if (product == null)
+            if (product == null || string.IsNullOrWhiteSpace(product.Name) || string.IsNullOrWhiteSpace(product.Description) || product.Price < 0 || 
+                ((product as ProductByQuantity)?.Quantity ?? (product as ProductByWeight)?.Weight) < 0)
             {
                 return false;
             }

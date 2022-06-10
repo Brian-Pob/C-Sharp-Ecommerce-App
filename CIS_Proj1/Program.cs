@@ -28,6 +28,7 @@ namespace CIS_Proj
             bool cont = true;
             while (cont)
             {
+                Console.WriteLine("\n-------------------------------\n");
                 var action = SelectActionType(login);
                 
                 if (action == ActionType.Exit)
@@ -45,55 +46,8 @@ namespace CIS_Proj
 
                     _ = int.TryParse(Console.ReadLine() ?? "0", out int sortBy);
                     inventoryService.SortBy = sortBy;
-                    ListNavigator<Product> navigator;
-                    while (true)
-                    {
-                        navigator = inventoryService.ListNavigator;
-                        try
-                        {
-                            foreach (var keyValuePair in navigator.GetCurrentPage())
-                            {
-                                Console.WriteLine(keyValuePair.Value);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
-                        Console.Write("\nPages: ");
-                        for (int i = 1; i <= inventoryService.Products.Count / navigator.PageSize + (inventoryService.Products.Count % navigator.PageSize != 0 ? 1 : 0); i++)
-                        {
-                            if (i == navigator.CurrentPage)
-                            {
-                                Console.Write($"-{i}- ");
-                            }
-                            else
-                            {
-                                Console.Write($"{i} ");
-                            }
-                        }
-                        Console.WriteLine();
-                        if (navigator.HasNextPage) { Console.WriteLine("Next Page (N)"); }
-                        if (navigator.HasPreviousPage) { Console.WriteLine("Previous Page (P)"); }
-                        if (inventoryService.Products.Count / navigator.PageSize > 0) { Console.WriteLine("Go to Page (Page#)"); }
-                        Console.WriteLine("Exit (E)");
-                        var input = Console.ReadLine() ?? "";
-                        if (input.ToLower() == "e") { break; }
-                        else if (input.ToLower() == "n" && navigator.HasNextPage) { navigator.GoForward(); }
-                        else if (input.ToLower() == "p" && navigator.HasPreviousPage) { navigator.GoBackward(); }
-                        else if (int.TryParse(input, out int page))
-                        {
-                            try
-                            {
-                                navigator.GoToPage(page);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
-                        }
-                        else { Console.WriteLine("Invalid Input"); }
-                    }
+                    ListNavigator<Product> navigator = inventoryService.ListNavigator;
+                    UseNavigator(navigator);
                 }
                 else if (action == ActionType.SearchInventory)
                 {
@@ -109,64 +63,27 @@ namespace CIS_Proj
                     _ = int.TryParse(Console.ReadLine() ?? "0", out int sortBy);
                     
                     inventoryService.SortBy = sortBy;
-                    var foundProducts = inventoryService.Search(term);
+                    _ = inventoryService.Search(term);
 
-                    ListNavigator<Product> navigator;
-                    while (true)
-                    {
-                        navigator = inventoryService.SearchListNavigator;
-                        try
-                        {
-                            foreach (var keyValuePair in navigator.GetCurrentPage())
-                            {
-                                Console.WriteLine(keyValuePair.Value);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
-                        Console.Write("\nPages: ");
-                        for (int i = 1; i <= foundProducts.Count() / navigator.PageSize + (foundProducts.Count() % navigator.PageSize != 0 ? 1 : 0); i++)
-                        {
-                            if (i == navigator.CurrentPage)
-                            {
-                                Console.Write($"-{i}- ");
-                            }
-                            else
-                            {
-                                Console.Write($"{i} ");
-                            }
-                        }
-                        Console.WriteLine();
-                        if (navigator.HasNextPage) { Console.WriteLine("Next Page (N)"); }
-                        if (navigator.HasPreviousPage) { Console.WriteLine("Previous Page (P)"); }
-                        if (foundProducts.Count() / navigator.PageSize > 0) { Console.WriteLine("Go to Page (Page#)"); }
-                        Console.WriteLine("Exit (E)");
-                        var input = Console.ReadLine() ?? "";
-                        if (input.ToLower() == "e") { break; }
-                        else if (input.ToLower() == "n" && navigator.HasNextPage) { navigator.GoForward(); }
-                        else if (input.ToLower() == "p" && navigator.HasPreviousPage) { navigator.GoBackward(); }
-                        else if (int.TryParse(input, out int page))
-                        {
-                            try
-                            {
-                                navigator.GoToPage(page);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
-                        }
-                        else { Console.WriteLine("Invalid Input"); }
-                    }
-                    
+                    ListNavigator<Product> navigator = inventoryService.SearchListNavigator;
+                    UseNavigator(navigator);
+
                 }
                 else if (action == ActionType.AddToCart)
                 {
                     Console.WriteLine("--- Adding to Cart ---");
-                    Console.Write("Enter Id of item to add to cart: ");
-                    _ = int.TryParse(Console.ReadLine() ?? "-1", out int id);
+                    Console.Write("Enter Id of item to add to cart (blank to go back): ");
+                    string idInput = Console.ReadLine() ?? "";
+                    if (string.IsNullOrWhiteSpace(idInput))
+                    {
+                        Console.WriteLine("Going back. Nothing added to cart.");
+                        continue;
+                    }
+                    if (!int.TryParse(idInput, out int id))
+                    {
+                        Console.WriteLine("Invalid Id. Nothing added to cart.");
+                        continue;
+                    }
                     var product = inventoryService.Products.Find(p => p.Id == id);
                     if (product == null)
                     {
@@ -211,55 +128,8 @@ namespace CIS_Proj
 
                     _ = int.TryParse(Console.ReadLine() ?? "0", out int sortBy);
                     cartService.SortBy = sortBy;
-                    ListNavigator<Product> navigator;
-                    while (true)
-                    {
-                        navigator = cartService.ListNavigator;
-                        try
-                        {
-                            foreach (var keyValuePair in navigator.GetCurrentPage())
-                            {
-                                Console.WriteLine(keyValuePair.Value);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
-                        Console.Write("\nPages: ");
-                        for (int i = 1; i <= cartService.Products.Count / navigator.PageSize + (cartService.Products.Count % navigator.PageSize != 0 ? 1 : 0); i++)
-                        {
-                            if (i == navigator.CurrentPage)
-                            {
-                                Console.Write($"-{i}- ");
-                            }
-                            else
-                            {
-                                Console.Write($"{i} ");
-                            }
-                        }
-                        Console.WriteLine();
-                        if (navigator.HasNextPage) { Console.WriteLine("Next Page (N)"); }
-                        if (navigator.HasPreviousPage) { Console.WriteLine("Previous Page (P)"); }
-                        if (cartService.Products.Count / navigator.PageSize > 0) { Console.WriteLine("Go to Page (Page#)"); }
-                        Console.WriteLine("Exit (E)");
-                        var input = Console.ReadLine() ?? "";
-                        if (input.ToLower() == "e") { break; }
-                        else if (input.ToLower() == "n" && navigator.HasNextPage) { navigator.GoForward(); }
-                        else if (input.ToLower() == "p" && navigator.HasPreviousPage) { navigator.GoBackward(); }
-                        else if (int.TryParse(input, out int page))
-                        {
-                            try
-                            {
-                                navigator.GoToPage(page);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
-                        }
-                        else { Console.WriteLine("Invalid Input"); }
-                    }
+                    ListNavigator<Product> navigator = cartService.ListNavigator;
+                    UseNavigator(navigator);
                 }
                 else if (action == ActionType.DeleteFromCart)
                 {
@@ -314,57 +184,10 @@ namespace CIS_Proj
                     _ = int.TryParse(Console.ReadLine() ?? "0", out int sortBy);
 
                     cartService.SortBy = sortBy;
-                    var foundProducts = cartService.Search(term);
+                    _ = cartService.Search(term);
 
-                    ListNavigator<Product> navigator;
-                    while (true)
-                    {
-                        navigator = cartService.SearchListNavigator;
-                        try
-                        {
-                            foreach (var keyValuePair in navigator.GetCurrentPage())
-                            {
-                                Console.WriteLine(keyValuePair.Value);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
-                        Console.Write("\nPages: ");
-                        for (int i = 1; i <= foundProducts.Count() / navigator.PageSize + (foundProducts.Count() % navigator.PageSize != 0 ? 1 : 0); i++)
-                        {
-                            if (i == navigator.CurrentPage)
-                            {
-                                Console.Write($"-{i}- ");
-                            }
-                            else
-                            {
-                                Console.Write($"{i} ");
-                            }
-                        }
-                        Console.WriteLine();
-                        if (navigator.HasNextPage) { Console.WriteLine("Next Page (N)"); }
-                        if (navigator.HasPreviousPage) { Console.WriteLine("Previous Page (P)"); }
-                        if (foundProducts.Count() / navigator.PageSize > 0) { Console.WriteLine("Go to Page (Page#)"); }
-                        Console.WriteLine("Exit (E)");
-                        var input = Console.ReadLine() ?? "";
-                        if (input.ToLower() == "e") { break; }
-                        else if (input.ToLower() == "n" && navigator.HasNextPage) { navigator.GoForward(); }
-                        else if (input.ToLower() == "p" && navigator.HasPreviousPage) { navigator.GoBackward(); }
-                        else if (int.TryParse(input, out int page))
-                        {
-                            try
-                            {
-                                navigator.GoToPage(page);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
-                        }
-                        else { Console.WriteLine("Invalid Input"); }
-                    }
+                    ListNavigator<Product> searchListNavigator = cartService.SearchListNavigator;
+                    UseNavigator(searchListNavigator);
                 }
                 else if (action == ActionType.Save)
                 {
@@ -388,10 +211,6 @@ namespace CIS_Proj
                         Console.WriteLine("Exiting");
                         break;
                     }
-                    else
-                    {
-                        Console.WriteLine("Checkout failed.");
-                    }
                 }
 
                 /* Employee Only Actions */
@@ -407,7 +226,12 @@ namespace CIS_Proj
                     {
                         Console.WriteLine("--- Adding Product By Quantity ---");
                         newProduct = new ProductByQuantity();
-                        FillQuantityProduct((ProductByQuantity)newProduct);
+                        if (!FillQuantityProduct((ProductByQuantity)newProduct))
+                        {
+                            Console.WriteLine("Failed to add product.");
+                            continue;
+                        }
+                        
                         if (inventoryService.Create(newProduct))
                         {
                             Console.WriteLine("Product added successfully.");
@@ -439,12 +263,22 @@ namespace CIS_Proj
                 else if (action == ActionType.UpdateInventory)
                 {
                     Console.WriteLine("--- Updating Inventory ---");
-                    Console.Write("Enter Product Id to update: ");
-                    _ = int.TryParse(Console.ReadLine() ?? "0", out int id);
+                    Console.Write("Enter Product Id to update (blank to go back): ");
+                    string idInput = Console.ReadLine() ?? "";
+                    if (string.IsNullOrWhiteSpace(idInput))
+                    {
+                        Console.WriteLine("Cancelling update. Nothing was changed.");
+                        continue;
+                    }
+                    if (!int.TryParse(idInput, out int id))
+                    {
+                        Console.WriteLine("Invalid Product Id. Cancelling update. Nothing was changed.");
+                        continue;
+                    }
                     var product = inventoryService.Products.FirstOrDefault(p => p.Id == id);
                     if (product == null)
                     {
-                        Console.WriteLine("Product not found.");
+                        Console.WriteLine("Product not found. Cancelling update. Nothing was changed.");
                         continue;
                     }
                     else
@@ -455,45 +289,75 @@ namespace CIS_Proj
                     
                     if (product is ProductByQuantity)
                     {
-                        Console.Write("Enter quantity to update: ");
-                        _ = int.TryParse(Console.ReadLine() ?? "0", out int quantity);
-                        if (quantity < 0)
+                        Console.WriteLine("Current Quantity: " + ((ProductByQuantity)product).Quantity);
+                        Console.Write("Enter new quantity (blank to keep quantity): ");
+                        string input2 = Console.ReadLine() ?? "";
+                        int quantity = -1;
+                        if (string.IsNullOrWhiteSpace(input2))
                         {
-                            Console.WriteLine("Quantity cannot be negative.");
-                            continue;
+                            Console.WriteLine("Keeping current quantity.");
                         }
-                        ((ProductByQuantity)product).Quantity = quantity;
+                        else
+                        {
+                            if(!int.TryParse(input2, out quantity))
+                            {
+                                Console.WriteLine("Invalid quantity.");
+                                continue;
+                            }
+                            if (quantity < 0)
+                            {
+                                Console.WriteLine("Quantity cannot be negative.");
+                                continue;
+                            }
+                            ((ProductByQuantity)product).Quantity = quantity;
+                        }
                     }
                     else if (product is ProductByWeight)
                     {
-                        Console.Write("Enter weight to update: ");
-                        _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal weight);
-                        if (weight < 0)
+                        Console.WriteLine("Current Weight: " + ((ProductByWeight)product).Weight);
+                        Console.Write("Enter new weight (blank to keep weight): ");
+                        string input2 = Console.ReadLine() ?? "";
+                        decimal weight = -1;
+                        if (string.IsNullOrWhiteSpace(input2))
                         {
-                            Console.WriteLine("Weight cannot be negative.");
-                            continue;
+                            Console.WriteLine("Keeping current weight.");
                         }
-                        ((ProductByWeight)product).Weight = weight;
+                        else
+                        {
+                            _ = decimal.TryParse(input2, out weight);
+                            if (weight < 0)
+                            {
+                                Console.WriteLine("Weight cannot be negative.");
+                                continue;
+                            }
+                            ((ProductByWeight)product).Weight = weight;
+                        }
                     }
 
                     Console.Write("Update other details (name, desc, price, BOGO status)? (y/n): ");
                     var input = Console.ReadLine() ?? "";
                     if (input.ToLower() == "y")
                     {
-                        Console.Write("Enter name: ");
-                        product.Name = Console.ReadLine() ?? "";
-                        Console.Write("Enter description: ");
-                        product.Description = Console.ReadLine() ?? "";
-                        Console.Write("Enter price");
-                        _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal price);
-                        if (price < 0)
+                        string input2;
+                        Console.Write("Enter name (blank to keep name): ");
+                        input2 = Console.ReadLine() ?? "";
+                        product.Name = (string.IsNullOrWhiteSpace(input2) ? product.Name : input2);
+                        Console.Write("Enter description (blank to keep description): ");
+                        input2 = Console.ReadLine() ?? "";
+                        product.Description = (string.IsNullOrWhiteSpace(input2) ? product.Description : input2);
+                        Console.Write("Enter price (blank to keep price): $");
+                        input2 = Console.ReadLine() ?? "";
+                        if (decimal.TryParse(input2, out decimal price))
                         {
-                            Console.WriteLine("Price cannot be negative.");
-                            continue;
+                            if (price < 0)
+                            {
+                                Console.WriteLine("Price cannot be negative.");
+                                continue;
+                            }
+                            product.Price = price;
                         }
 
-                        product.Price = price;
-                        Console.Write("Enter BOGO status (y/n): ");
+                        Console.Write("Is item BOGO? (y/n): ");
                         input = Console.ReadLine() ?? "";
                         if (input.ToLower() == "y")
                         {
@@ -506,7 +370,6 @@ namespace CIS_Proj
                         else
                         {
                             Console.WriteLine("Invalid input.");
-                            continue;
                         }
 
                         Console.WriteLine("New product details:");
@@ -597,30 +460,71 @@ namespace CIS_Proj
 
             return (ProductType)selection;
         }
-        public static void FillQuantityProduct(ProductByQuantity product)
+        public static bool FillQuantityProduct(ProductByQuantity product)
         {
             if (product == null)
             {
-                return;
+                return false;
             }
 
             Console.Write("Item name: ");
             product.Name = Console.ReadLine() ?? string.Empty;
-
+            if (string.IsNullOrWhiteSpace(product.Name))
+            {
+                Console.WriteLine("Invalid name.");
+                return false;
+            }
+            
             Console.Write("Item Description: ");
             product.Description = Console.ReadLine() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(product.Description))
+            {
+                Console.WriteLine("Invalid description.");
+                return false;
+            }
 
             Console.Write("Item price: $");
-            _ = decimal.TryParse(Console.ReadLine() ?? "0", out decimal price);
+            if(!decimal.TryParse(Console.ReadLine() ?? "0", out decimal price))
+            {
+                Console.WriteLine("Invalid price.");
+                return false;
+            }
+            if (price < 0)
+            {
+                Console.WriteLine("Price cannot be negative.");
+                return false;
+            }
             product.Price = price;
 
             Console.Write("Item quantity: ");
-            _ = int.TryParse(Console.ReadLine() ?? "0", out int quantity);
+            if(!int.TryParse(Console.ReadLine() ?? "0", out int quantity))
+            {
+                Console.WriteLine("Invalid quantity.");
+                return false;
+            }
+            if (quantity < 0)
+            {
+                Console.WriteLine("Invalid quantity.");
+                return false;
+            }
             product.Quantity = quantity;
 
             Console.Write("BOGO deal? (y/n): ");
             var input = Console.ReadLine() ?? "";
-            (product as ProductByQuantity).IsBogo = input.ToLower() == "y";
+            if (input.ToLower() == "y")
+            {
+                product.IsBogo = true;
+            }
+            else if (input.ToLower() == "n")
+            {
+                product.IsBogo = false;
+            }
+            else
+            {
+                Console.WriteLine("Invalid input.");
+                return false;
+            }
+            return true;
         }
 
         public static void FillWeightProduct(ProductByWeight product)
@@ -661,6 +565,8 @@ namespace CIS_Proj
             Console.WriteLine("Total:  $" + Decimal.Round((total + total * (decimal)salesTax), 2));
             Console.Write("Enter billing information: ");
             Console.ReadLine();
+            Console.Write("Enter shipping information: ");
+            Console.ReadLine();
 
             Console.Write("\nConfirm checkout? (y/n): ");
             var input = Console.ReadLine() ?? "n";
@@ -686,6 +592,57 @@ namespace CIS_Proj
                 list.Add($"{i++} - {item}");
             }
             return list;
+        }
+
+        public static void UseNavigator(ListNavigator<Product> navigator)
+        {
+            while (true)
+            {
+                try
+                {
+                    foreach (var keyValuePair in navigator.GetCurrentPage())
+                    {
+                        Console.WriteLine(keyValuePair.Value);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                Console.Write("\nPages: ");
+                for (int i = 1; i <= navigator.ListSize / navigator.PageSize + (navigator.ListSize % navigator.PageSize != 0 ? 1 : 0); i++)
+                {
+                    if (i == navigator.CurrentPage)
+                    {
+                        Console.Write($"-{i}- ");
+                    }
+                    else
+                    {
+                        Console.Write($"{i} ");
+                    }
+                }
+                Console.WriteLine();
+                if (navigator.HasNextPage) { Console.WriteLine("Next Page (N)"); }
+                if (navigator.HasPreviousPage) { Console.WriteLine("Previous Page (P)"); }
+                if (navigator.ListSize / navigator.PageSize > 0) { Console.WriteLine("Go to Page (Page#)"); }
+                Console.WriteLine("Exit (E)");
+                var input = Console.ReadLine() ?? "";
+                if (input.ToLower() == "e") { break; }
+                else if (input.ToLower() == "n" && navigator.HasNextPage) { navigator.GoForward(); }
+                else if (input.ToLower() == "p" && navigator.HasPreviousPage) { navigator.GoBackward(); }
+                else if (int.TryParse(input, out int page))
+                {
+                    try
+                    {
+                        navigator.GoToPage(page);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+                else { Console.WriteLine("Invalid Input"); }
+            }
         }
     }
 

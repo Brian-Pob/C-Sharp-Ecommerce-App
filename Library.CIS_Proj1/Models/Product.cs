@@ -21,6 +21,7 @@ namespace Library.CIS_Proj.Models
 
 		public Product()
         {
+			Id = -1;
             Name = string.Empty;
             Description = string.Empty;
             Price = 0;

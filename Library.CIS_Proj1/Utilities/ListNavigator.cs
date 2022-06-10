@@ -17,6 +17,12 @@ namespace Library.CIS_Proj.Utilities
             get { return currentPage; }
         }
         private IEnumerable<T> state;
+        
+        public int ListSize
+        {
+            get { return state.Count(); }
+        }
+        
         private int lastPage
         {
             get
