@@ -27,25 +27,25 @@ namespace GUI_App
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
         public LoginType _loginType { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private InventoryService _InventoryService;
-        public ObservableCollection<Product> Products
+        public List<Product> Products
         {
             get
             {
                 if(_InventoryService == null)
                 {
-                    return new ObservableCollection<Product>();
+                    return new List<Product>();
                 }
-                return new ObservableCollection<Product>(_InventoryService.Products);
+                return (InventoryService.Current.Products);
             }
         }
         public Product SelectedProduct { get; set; }
@@ -53,7 +53,7 @@ namespace GUI_App
         {
             this.InitializeComponent();
             DataContext = this;
-            ShowLoginDialog();
+            //ShowLoginDialog();
 
             _InventoryService = InventoryService.Current;
             var test = new ProductByQuantity();
@@ -61,7 +61,7 @@ namespace GUI_App
             test.Description = "test prod";
             test.Price = (decimal)9.99;
             test.Quantity = 3;
-            _InventoryService.Create(test);
+            InventoryService.Current.Create(test);
             NotifyPropertyChanged("Products");
 
         }

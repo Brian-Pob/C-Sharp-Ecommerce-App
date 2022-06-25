@@ -47,7 +47,7 @@ namespace GUI_App.Dialogs
                 qdc.Price = dc.Price;
                 qdc.Quantity = (int)CountBox.Value;
                 qdc.IsBogo = (bool)(BogoCb as CheckBox).IsChecked;
-                InventoryService.Current.Create(qdc);
+                InventoryService.Current.Create(qdc.Clone());
 
             }
 
