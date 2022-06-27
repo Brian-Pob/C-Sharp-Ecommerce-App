@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -12,14 +15,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using GUI_App.Dialogs;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Collections.ObjectModel;
 using Library.GUI_App.Models;
 using Library.GUI_App.Services;
 using Library.GUI_App.Utilities;
-
+using GUI_App.Dialogs;
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace GUI_App
@@ -30,13 +29,16 @@ namespace GUI_App
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         public LoginType _loginType { get; set; }
+        public string Query { get; set; }
+        private InventoryService _InventoryService;
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private InventoryService _InventoryService;
+        public Product SelectedProduct { get; set; }
         public List<Product> Products
         {
             get
@@ -48,21 +50,13 @@ namespace GUI_App
                 return (InventoryService.Current.Products);
             }
         }
-        public Product SelectedProduct { get; set; }
         public MainPage()
         {
             this.InitializeComponent();
             DataContext = this;
-            //ShowLoginDialog();
-
+            ShowLoginDialog();
             _InventoryService = InventoryService.Current;
-            var test = new ProductByQuantity();
-            test.Name = "Test product";
-            test.Description = "test prod";
-            test.Price = (decimal)9.99;
-            test.Quantity = 3;
-            InventoryService.Current.Create(test);
-            NotifyPropertyChanged("Products");
+            
 
         }
 
@@ -79,8 +73,7 @@ namespace GUI_App
             {
                 _loginType = LoginType.Customer;
             }
-            var logintypetext = this.FindName("LoginTypeText") as TextBlock;
-            logintypetext.Text = _loginType.ToString();
+            LoginTypeText.Text = _loginType.ToString();
         }
         private async void Add_Click(object sender, RoutedEventArgs e)
         {

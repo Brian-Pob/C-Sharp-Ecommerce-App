@@ -30,8 +30,10 @@ namespace GUI_App.Dialogs
             this.InitializeComponent();
             this.DataContext = new Product();
             UseQuantity();
+            SetPriceFormat();
         }
 
+        
         // ADD
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
@@ -112,6 +114,19 @@ namespace GUI_App.Dialogs
             formatter.FractionDigits = 2;
             formatter.NumberRounder = rounder;
             CountBox.NumberFormatter = formatter;
+        }
+
+        private void SetPriceFormat()
+        {
+            IncrementNumberRounder rounder = new IncrementNumberRounder();
+            rounder.Increment = 0.1;
+            rounder.RoundingAlgorithm = RoundingAlgorithm.RoundUp;
+
+            DecimalFormatter formatter = new DecimalFormatter();
+            formatter.IntegerDigits = 1;
+            formatter.FractionDigits = 2;
+            formatter.NumberRounder = rounder;
+            PriceBox.NumberFormatter = formatter;
         }
     }
 }

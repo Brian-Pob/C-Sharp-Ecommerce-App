@@ -18,6 +18,17 @@ namespace Library.GUI_App.Models
 				price = Decimal.Round(value, 2);
 			}
 		}
+		public Double DoublePrice
+        {
+            get
+            {
+				return (double)price;
+            }
+            set
+            {
+				Price = (decimal)value;
+            }
+        }
 
 		public Product()
         {
