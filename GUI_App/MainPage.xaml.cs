@@ -39,15 +39,15 @@ namespace GUI_App
         }
 
         public Product SelectedProduct { get; set; }
-        public List<Product> Products
+        public ObservableCollection<Product> Products
         {
             get
             {
                 if(_InventoryService == null)
                 {
-                    return new List<Product>();
+                    return new ObservableCollection<Product>();
                 }
-                return (InventoryService.Current.Products);
+                return new ObservableCollection<Product>(InventoryService.Current.Products);
             }
         }
         public MainPage()
