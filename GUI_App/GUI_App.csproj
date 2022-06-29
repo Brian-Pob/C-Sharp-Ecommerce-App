@@ -122,17 +122,26 @@
     <Compile Include="Dialogs\AddItemDialog.xaml.cs">
       <DependentUpon>AddItemDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\AddToCartDialog.xaml.cs">
+      <DependentUpon>AddToCartDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ChooseCartDialog.xaml.cs">
+      <DependentUpon>ChooseCartDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\LoginDialog.xaml.cs">
       <DependentUpon>LoginDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SaveCartDialog.xaml.cs">
+      <DependentUpon>SaveCartDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SaveStatusDialog.xaml.cs">
+      <DependentUpon>SaveStatusDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\CustomerPage.xaml.cs">
-      <DependentUpon>CustomerPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\EmployeePage.xaml.cs">
-      <DependentUpon>EmployeePage.xaml</DependentUpon>
+    <Compile Include="Pages\ViewCartPage.xaml.cs">
+      <DependentUpon>ViewCartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -160,7 +169,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\AddToCartDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ChooseCartDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\LoginDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SaveCartDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SaveStatusDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -168,11 +193,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Pages\CustomerPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\EmployeePage.xaml">
+    <Page Include="Pages\ViewCartPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -180,6 +201,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.14</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.DataGrid">
+      <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.7.1</Version>

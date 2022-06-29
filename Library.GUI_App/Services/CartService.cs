@@ -224,27 +224,53 @@ namespace Library.GUI_App.Services
             return true;
         }
 
-        public bool Save(string filename = "cart.json")
+        private string persistPath
+            = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Carts\\";
+        public bool Save(string filename = "defaultcart.json")
         {
             var options = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
             };
-            var cartJson = JsonConvert.SerializeObject(productList, options);
-            File.WriteAllText(filename, cartJson);
-            return true;
+
+            try
+            {
+                var inventoryJson = JsonConvert.SerializeObject(productList, options);
+
+                File.WriteAllText(persistPath + filename, inventoryJson);
+                return true;
+            }
+            catch (Exception)
+            {
+
+                //throw;
+                return false;
+            }
         }
 
-        public bool Load(string filename = "cart.json")
+        public bool Load(string filename = "defaultcart.json")
         {
             var options = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
+
             };
-            var cartJson = File.ReadAllText(filename);
-            productList = JsonConvert.DeserializeObject<List<Product>>(cartJson, options) ?? new List<Product>();
-            listNavigator = new ListNavigator<Product>(productList);
-            return true;
+            try
+            {
+                var inventoryJson = File.ReadAllText(persistPath + filename);
+                productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
+                listNavigator = new ListNavigator<Product>(SortedList);
+                return true;
+
+
+            }
+            catch (Exception)
+            {
+
+                //throw;
+                return false;
+            }
+
         }
 
         public void List(int choice = 0)

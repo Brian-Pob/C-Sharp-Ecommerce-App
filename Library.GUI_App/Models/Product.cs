@@ -30,7 +30,9 @@ namespace Library.GUI_App.Models
             }
         }
 
-		public Product()
+		public decimal Count { get; set; }
+        public string Unit { get; set; }
+        public Product()
         {
 			Id = -1;
             Name = string.Empty;

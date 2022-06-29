@@ -45,7 +45,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Description"></TextBlock>
-            <TextBox Grid.Column="1" Text="{Binding Path=Description, Mode=TwoWay}"/>
+            <TextBox Grid.Column="1" Text="{Binding Path=Description, Mode=TwoWay}" Height="92" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

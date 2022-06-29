@@ -35,6 +35,16 @@ namespace Library.GUI_App.Models
             }
         }
 
+        public new decimal Count
+        {
+            get { return Weight; }
+        }
+
+        public new string Unit
+        {
+            get { return "lbs"; }
+        }
+
         public ProductByWeight()
         {
             Name = string.Empty;

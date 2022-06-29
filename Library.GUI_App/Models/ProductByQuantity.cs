@@ -35,6 +35,16 @@ namespace Library.GUI_App.Models
             return $"{Id} - {Name}: {Description}. ${Price} x {Quantity} = ${TotalPrice} {(IsBogo ? "BOGO" : "")}";
         }
 
+        public new decimal Count
+        {
+            get { return Quantity; }
+            set { Quantity = (int)decimal.Round(value); }
+        }
+        
+        public new string Unit
+        {
+            get { return "pcs."; }
+        }
         public new ProductByQuantity Clone()
         {
             return (ProductByQuantity)this.MemberwiseClone();

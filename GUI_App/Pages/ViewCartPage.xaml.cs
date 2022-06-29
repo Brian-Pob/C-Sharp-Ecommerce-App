@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Library.GUI_App.Models;
+using Library.GUI_App.Services;
+using Microsoft.Toolkit.Uwp.UI.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -15,183 +18,70 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using Library.GUI_App.Models;
-using Library.GUI_App.Services;
-using Library.GUI_App.Utilities;
-using GUI_App.Dialogs;
-using Microsoft.Toolkit.Uwp.UI.Controls;
-using GUI_App.Pages;
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
-namespace GUI_App
+// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
+
+namespace GUI_App.Pages
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page, INotifyPropertyChanged
+    public sealed partial class ViewCartPage : Page, INotifyPropertyChanged
     {
-        public LoginType _loginType { get; set; }
-        public string Query { get; set; }
-        private InventoryService _InventoryService { get; set; }
-        private CartService _CartService { get; set; }
-        private string SelectedCart;
-
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        public Product SelectedProduct { get; set; }
+        private CartService _CartService { get; set; }
         public ObservableCollection<Product> Products
         {
             get
             {
-                if(_InventoryService == null)
+                if (_CartService == null)
                 {
+                    _CartService = CartService.Current;
                     return new ObservableCollection<Product>();
                 }
-                return new ObservableCollection<Product>(InventoryService.Current.Products);
+                return new ObservableCollection<Product>(CartService.Current.Products);
             }
         }
-        public MainPage()
+        public ViewCartPage()
         {
             this.InitializeComponent();
-            DataContext = this;
-            //ShowLoginDialog();
-            _loginType = LoginType.Employee;
-            _InventoryService = InventoryService.Current;
             _CartService = CartService.Current;
-            
-            _InventoryService.CartService = _CartService;
-            _CartService.InventoryService = _InventoryService;
-
-            InventoryService.Current.Load();
-
-            // if cartPersistPath directory does not exist, create it
-
-            if (!Directory.Exists(cartPersistPath))
-            {
-                Directory.CreateDirectory(cartPersistPath);
-            }
-
-            ShowChooseCartDialog();
+            DataContext = this;
             NotifyPropertyChanged("Products");
-            var test = Products;
-
-            AddToCartBtn.IsEnabled = false;
-            NavigationCacheMode = NavigationCacheMode.Required;
-        }
-
-
-        private async void ShowLoginDialog()
-        {
-            var dialog = new LoginDialog();
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                _loginType = LoginType.Employee;
-            }
-            else
-            {
-                _loginType = LoginType.Customer;
-                dg.IsReadOnly = true;
-                AddProductBtn.Visibility = Visibility.Collapsed;
-            }
-            LoginTypeBtn.Content = _loginType.ToString();
-        }
-
-        private string cartPersistPath
-            = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Carts\\";        
-        private async void ShowChooseCartDialog()
-        {
-            
-
-            try
-            {
-                var files = Directory.GetFiles(cartPersistPath);
-                if (files.Length == 0)
-                    return;
-            }
-            catch (Exception)
-            {
-                return;
-            }
-            
-
-            var dialog = new ChooseCartDialog();
-            var result = await dialog.ShowAsync();
-
-            if (result == ContentDialogResult.Primary)
-            {
-                SelectedCart = dialog.SelectedCart;
-            }
-            else
-            {
-                SelectedCart = null;
-            }
-            
-
-        }
-        private async void Add_Click(object sender, RoutedEventArgs e)
-        {
-            
-            var diag = new AddItemDialog();
-            await diag.ShowAsync();
-            //NotifyPropertyChanged("Products");
-            dg.ItemsSource = Products;
-            RemoveSortDirection();
-            
-            //var page = new SecondaryPage();
-            //Frame.Navigate(typeof(SecondaryPage));
-
-        }
-
-        private async void Add_To_Cart_Click(object sender, RoutedEventArgs e)
-        {
-            var diag = new AddToCartDialog(SelectedProduct);
-            await diag.ShowAsync();
-            //NotifyPropertyChanged("Products");
-            dg.ItemsSource = Products;
-            RemoveSortDirection();
         }
 
         private void DG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (dg.SelectedItem != null)
-            {
-                //SelectedProduct = (Product)dg.SelectedItem;
-                AddToCartBtn.IsEnabled = true;
-            }
-            else
-            {
-                AddToCartBtn.IsEnabled = false;
-            }
+            
         }
 
 
         private void DataGrid_Sorting(object sender, Microsoft.Toolkit.Uwp.UI.Controls.DataGridColumnEventArgs e)
         {
-            if(e.Column.Tag.ToString() == "Name")
+            if (e.Column.Tag.ToString() == "Name")
             {
                 if (e.Column.SortDirection == null || e.Column.SortDirection == DataGridSortDirection.Descending)
                 {
                     dg.ItemsSource = new ObservableCollection<Product>(from p in Products
-                                                                        orderby p.Name ascending
-                                                                        select p);
+                                                                       orderby p.Name ascending
+                                                                       select p);
                     e.Column.SortDirection = DataGridSortDirection.Ascending;
 
                 }
                 else
                 {
                     dg.ItemsSource = new ObservableCollection<Product>(from p in Products
-                                                                        orderby p.Name descending
-                                                                        select p);
+                                                                       orderby p.Name descending
+                                                                       select p);
                     e.Column.SortDirection = DataGridSortDirection.Descending;
                 }
             }
 
-            if(e.Column.Tag.ToString() == "Id")
+            if (e.Column.Tag.ToString() == "Id")
             {
                 if (e.Column.SortDirection == null || e.Column.SortDirection == DataGridSortDirection.Descending)
                 {
@@ -210,7 +100,7 @@ namespace GUI_App
                 }
             }
 
-            if(e.Column.Tag.ToString() == "Description")
+            if (e.Column.Tag.ToString() == "Description")
             {
                 if (e.Column.SortDirection == null || e.Column.SortDirection == DataGridSortDirection.Descending)
                 {
@@ -274,7 +164,7 @@ namespace GUI_App
                 //{
                 //    if(pcopy[i] is ProductByQuantity)
                 //    {
-                        
+
                 //    }
                 //}
                 if (e.Column.SortDirection == null || e.Column.SortDirection == DataGridSortDirection.Descending)
@@ -317,7 +207,7 @@ namespace GUI_App
 
         private void RemoveSortDirection(Microsoft.Toolkit.Uwp.UI.Controls.DataGridColumnEventArgs e = null)
         {
-            
+
             foreach (var dgColumn in dg.Columns)
             {
                 if (e == null || dgColumn.Tag.ToString() != e.Column.Tag.ToString())
@@ -327,42 +217,14 @@ namespace GUI_App
             }
         }
 
-        private async void Save_Button_Click(object sender, RoutedEventArgs e)
+        private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new SaveCartDialog(SelectedCart);
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                InventoryService.Current.Save();
-            }
+            Frame.GoBack();
         }
 
-        private void Login_Button_Click(object sender, RoutedEventArgs e)
+        private void CheckoutButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_loginType == LoginType.Employee)
-            {
-                _loginType = LoginType.Customer;
-                AddProductBtn.Visibility = Visibility.Collapsed;
-                dg.IsReadOnly = true;
-            }
-            else
-            {
-                _loginType = LoginType.Employee;
-                AddProductBtn.Visibility = Visibility.Visible;
-                dg.IsReadOnly = false;
-            }
-
-            NotifyPropertyChanged("_loginType");
-        }
-
-        private void ViewCartBtn_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(ViewCartPage));
-        }
-
-        private void dg_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
+            
         }
     }
-
 }

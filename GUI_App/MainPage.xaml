@@ -2,13 +2,21 @@
     x:Class="GUI_App.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:GUI_App"
+    xmlns:local="using:Library.GUI_App.Utilities"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+    <Page.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="5,5,5,5"/>
+        </Style>
+    </Page.Resources>
     <Grid>
+        <Grid.Resources>
+            <local:DecimalConverter x:Key="decimalConverter"/>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <!--Search Bar-->
@@ -22,13 +30,35 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="10*"/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="LoginTypeText" Grid.Column="0" Text="{Binding Path=_loginType, Mode=OneWay}"></TextBlock>
+            <Button Grid.Column="0" Content="{Binding Path=_loginType}" Click="Login_Button_Click" Name="LoginTypeBtn"/>
             <TextBox Grid.Column="1" Text="{Binding Path=Query, Mode=TwoWay}"></TextBox>
-            <Button Grid.Column="2" Content="Search" HorizontalAlignment="Stretch"  Height="50"></Button>
+            <Button Grid.Column="2" Content="Search" HorizontalAlignment="Stretch"/>
+            <Button Grid.Column="3" Content="View Cart" Name="ViewCartBtn" Click="ViewCartBtn_Click"/>
         </Grid>
         <Grid Grid.Row="1">
-            <ListBox ItemsSource="{Binding Path=Products,Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedProduct, Mode=TwoWay}"></ListBox>
+            <toolkit:DataGrid AutoGenerateColumns="False" ItemsSource="{Binding Path=Products, Mode=TwoWay}" Name="dg"
+                              CellEditEnding="dg_CellEditEnding"
+
+                              GridLinesVisibility="Vertical"
+                              CanUserSortColumns="True"
+                              Sorting="DataGrid_Sorting"
+                              SelectionMode="Single"
+                              SelectedItem="{Binding Path=SelectedProduct, Mode=TwoWay}"
+                              SelectionChanged="DG_SelectionChanged"
+                              
+                              >
+                <toolkit:DataGrid.Columns>
+                    <toolkit:DataGridTextColumn Header="ID" Binding="{Binding Id}" Tag="Id" IsReadOnly="True"/>
+                    <toolkit:DataGridTextColumn Header="Name" Binding="{Binding Name}" Tag="Name" IsReadOnly="False"/>
+                    <toolkit:DataGridTextColumn Header="Description" Binding="{Binding Description}" Tag="Description" IsReadOnly="False"/>
+                    <toolkit:DataGridCheckBoxColumn Header="BOGO Deal" Binding="{Binding IsBogo}" Tag="IsBogo" IsReadOnly="False"/>
+                    <toolkit:DataGridTextColumn Header="Price ($)" Binding="{Binding Price, Converter={StaticResource decimalConverter}}" Tag="Price" IsReadOnly="False"/>
+                    <toolkit:DataGridTextColumn Header="Count" Binding="{Binding Count, Converter={StaticResource decimalConverter}}" Tag="Count" IsReadOnly="False" />
+                    <toolkit:DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Tag="Unit" IsReadOnly="True"/>
+                </toolkit:DataGrid.Columns>
+            </toolkit:DataGrid>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -36,9 +66,9 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Button Content="Add Product" Grid.Column="0" HorizontalAlignment="Stretch" Click="Add_Click"></Button>
-            <Button Content="Edit Product" Grid.Column="1" HorizontalAlignment="Stretch"></Button>
-            <Button Content="Delete Product" Grid.Column="2" HorizontalAlignment="Stretch"></Button>
+            <Button Grid.Column="0" Content="Add Product" HorizontalAlignment="Stretch" Click="Add_Click" Name="AddProductBtn"/>
+            <Button Grid.Column="1" Content="Add Selected Item to Cart" HorizontalAlignment="Stretch" Click="Add_To_Cart_Click" Name="AddToCartBtn"/>
+            <Button Grid.Column="2" Content="Save Inventory and Cart" HorizontalAlignment="Stretch" Click="Save_Button_Click" Name="SaveBtn"/>
         </Grid>
     </Grid>
 </Page>

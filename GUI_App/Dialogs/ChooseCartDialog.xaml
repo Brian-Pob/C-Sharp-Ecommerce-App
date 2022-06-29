@@ -1,0 +1,35 @@
+﻿<ContentDialog
+    x:Class="GUI_App.Dialogs.ChooseCartDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:GUI_App.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Choose Cart to Load"
+    PrimaryButtonText="Load Cart"
+    SecondaryButtonText="Create New Cart"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+    <ContentDialog.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+    </ContentDialog.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Cart Name:"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding CartList}" SelectedItem="{Binding SelectedCart}" HorizontalAlignment="Stretch" Name="CartComboBox"/>
+        </Grid>
+    </Grid>
+</ContentDialog>

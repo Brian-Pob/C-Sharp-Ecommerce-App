@@ -128,6 +128,7 @@
     <Compile Include="Services\CartService.cs" />
     <Compile Include="Services\InventoryService.cs" />
     <Compile Include="Services\Service.cs" />
+    <Compile Include="Utilities\DecimalConverter.cs" />
     <Compile Include="Utilities\Enumerations.cs" />
     <Compile Include="Utilities\ListNavigator.cs" />
     <EmbeddedResource Include="Properties\Library.GUI_App.rd.xml" />

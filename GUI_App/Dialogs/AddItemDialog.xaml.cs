@@ -50,7 +50,16 @@ namespace GUI_App.Dialogs
                 qdc.Quantity = (int)CountBox.Value;
                 qdc.IsBogo = (bool)(BogoCb as CheckBox).IsChecked;
                 InventoryService.Current.Create(qdc.Clone());
-
+            }
+            else if(productType == ProductType.Weight)
+            {
+                ProductByWeight wdc = new ProductByWeight();
+                wdc.Name = dc.Name;
+                wdc.Description = dc.Description;
+                wdc.Price = dc.Price;
+                wdc.Weight = (decimal)CountBox.Value;
+                wdc.IsBogo = (bool)(BogoCb as CheckBox).IsChecked;
+                InventoryService.Current.Create(wdc.Clone());
             }
 
         }
@@ -106,8 +115,8 @@ namespace GUI_App.Dialogs
         private void UseWeight()
         {
             IncrementNumberRounder rounder = new IncrementNumberRounder();
-            rounder.Increment = 0.1;
-            rounder.RoundingAlgorithm = RoundingAlgorithm.RoundUp;
+            rounder.Increment = 0.01;
+            rounder.RoundingAlgorithm = RoundingAlgorithm.RoundDown;
 
             DecimalFormatter formatter = new DecimalFormatter();
             formatter.IntegerDigits = 1;
@@ -119,8 +128,8 @@ namespace GUI_App.Dialogs
         private void SetPriceFormat()
         {
             IncrementNumberRounder rounder = new IncrementNumberRounder();
-            rounder.Increment = 0.1;
-            rounder.RoundingAlgorithm = RoundingAlgorithm.RoundUp;
+            rounder.Increment = 0.01;
+            rounder.RoundingAlgorithm = RoundingAlgorithm.RoundDown;
 
             DecimalFormatter formatter = new DecimalFormatter();
             formatter.IntegerDigits = 1;

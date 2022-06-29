@@ -1,0 +1,41 @@
+﻿<ContentDialog
+    x:Class="GUI_App.Dialogs.AddToCartDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:GUI_App.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    Title="Adding X to Cart"
+    PrimaryButtonText="Add to Cart"
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+    <ContentDialog.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+    </ContentDialog.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Qty. to add:" Name="CountText"/>
+            <controls:NumberBox Grid.Column="1" Header="Max: N"
+                                Minimum="0" Maximum="100"
+                                SmallChange="1" LargeChange="5" SpinButtonPlacementMode="Compact" 
+                                Name="CountBox" ValidationMode="InvalidInputOverwritten" 
+                                Value="0" ValueChanged="CountBox_ValueChanged" />
+        </Grid>
+    </Grid>
+</ContentDialog>

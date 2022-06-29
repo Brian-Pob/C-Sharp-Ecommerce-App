@@ -76,6 +76,8 @@ namespace Library.GUI_App.Services
             }
         }
 
+        
+        
         /* CRUD methods */
         public bool Create(Product product)
         {
@@ -121,15 +123,28 @@ namespace Library.GUI_App.Services
             return false;
         }
 
+        private string persistPath
+            = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\";
         public bool Save(string filename = "inventory.json")
         {
             var options = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
             };
-            var inventoryJson = JsonConvert.SerializeObject(productList, options);
-            File.WriteAllText(filename, inventoryJson);
-            return true;
+
+            try
+            {
+                var inventoryJson = JsonConvert.SerializeObject(productList, options);
+
+                File.WriteAllText(persistPath+filename, inventoryJson);
+                return true;
+            }
+            catch (Exception)
+            {
+
+                //throw;
+                return false;
+            }
         }
 
         public bool Load(string filename = "inventory.json")
@@ -137,11 +152,24 @@ namespace Library.GUI_App.Services
             var options = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
+
             };
-            var inventoryJson = File.ReadAllText(filename);
-            productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
-            listNavigator = new ListNavigator<Product>(SortedList);
-            return true;
+            try
+            {
+                var inventoryJson = File.ReadAllText(persistPath+filename);
+                productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
+                listNavigator = new ListNavigator<Product>(SortedList);      
+                return true;
+
+
+            }
+            catch (Exception)
+            {
+
+                //throw new Exception("Failed to load inventory from file.");
+                return false;
+            }            
+            
         }
 
         private int _sortBy;
