@@ -152,13 +152,16 @@ namespace Library.GUI_App.Services
 
             return true;
         }
-        
-        /*
-         * Expected input: Product with Id exists in cart but quantity may not be valid.
+
+        /* Expected function: Updates the quantity/ weight of the product in the cart with the given id.
+         *                    Will also update the quantity/ weight in the inventory.
+         * Expected input: Copy of product that exists in cart with the quantity to be removed from cart and added back to inventory.
+         * Assumptions: Product definitely exists in cart. Quantity to be removed is valid (> 0 and <= quantity in cart).
          */
-        public bool Delete(Product product)
+        public bool Delete(Product passedProduct)
         {
-            var cartProduct = Products.Find(t => t.Id == product.Id);
+            var cartProduct = Products.Find(t => t.Id == passedProduct.Id);
+            var debug = InventoryService.Current.Products;
             if (cartProduct == null)
             {
                 Console.WriteLine("Product not found in cart.");
@@ -166,60 +169,28 @@ namespace Library.GUI_App.Services
             }
             else
             {
-                // Check if quantity/ weight is valid
-                
-                if (product is ProductByWeight)
+                // first cast to ProductByWeight or ProductByQuantity to get the quantity/ weight
+                if (cartProduct is ProductByWeight cartProductByWeight)
                 {
-                    if (((ProductByWeight)product).Weight <= 0)
+                    ProductByWeight inventoryProductByWeight = (ProductByWeight)InventoryService.Products.Where(t => t.Id == cartProductByWeight.Id).First();
+                    inventoryProductByWeight.Weight += (passedProduct as ProductByWeight).Weight;
+                    cartProductByWeight.Weight -= (passedProduct as ProductByWeight).Weight;
+                    if (cartProductByWeight.Weight <= 0) // if the weight is 0 or less, remove the product from the cart
                     {
-                        Console.WriteLine("Invalid weight. Nothing deleted from cart.");
-                        return false;
-                    }
-                    else if (((ProductByWeight)cartProduct).Weight < ((ProductByWeight)product).Weight)
-                    {
-                        Console.WriteLine("Not enough weight in cart. Nothing deleted.");
-                        return false;
-                    }
-                    
-
-                    Console.WriteLine("Updating weight in cart.");
-                    ((ProductByWeight)cartProduct).Weight -= ((ProductByWeight)product).Weight;
-                    if (((ProductByWeight)cartProduct).Weight == 0)
-                    {
-                        Console.WriteLine("Weight is 0. Deleting product from cart.");
-                        Products.Remove(cartProduct);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Weight of {cartProduct.Name} in cart is now {((ProductByWeight)cartProduct).Weight}.");
+                        Products.Remove(cartProductByWeight);
                     }
                 }
-                else if (product is ProductByQuantity)
+                else if (cartProduct is ProductByQuantity cartProductByQuantity)
                 {
-                    if (((ProductByQuantity)product).Quantity <= 0)
+                    ProductByQuantity inventoryProductByQuantity = (ProductByQuantity)InventoryService.Products.Where(t => t.Id == cartProductByQuantity.Id).First();
+                    inventoryProductByQuantity.Quantity += (passedProduct as ProductByQuantity).Quantity;
+                    cartProductByQuantity.Quantity -= (passedProduct as ProductByQuantity).Quantity;
+                    if (cartProductByQuantity.Quantity <= 0)
                     {
-                        Console.WriteLine("Invalid quantity. Nothing deleted from cart.");
-                        return false;
+                        Products.Remove(cartProductByQuantity);
                     }
-                    else if (((ProductByQuantity)cartProduct).Quantity < ((ProductByQuantity)product).Quantity)
-                    {
-                        Console.WriteLine("Not enough quantity in cart. Nothing deleted.");
-                        return false;
-                    }
-                    
-                    Console.WriteLine("Updating quantity in cart.");
-                    ((ProductByQuantity)cartProduct).Quantity -= ((ProductByQuantity)product).Quantity;
-                    if (((ProductByQuantity)cartProduct).Quantity == 0)
-                    {
-                        Console.WriteLine("Quantity is 0. Deleting product from cart.");
-                        Products.Remove(cartProduct);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Quantity of {cartProduct.Name} in cart is now {((ProductByQuantity)cartProduct).Quantity}.");
-                    }
-
                 }
+
             }
             return true;
         }

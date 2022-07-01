@@ -53,7 +53,8 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="QtyOrWtTextBlock" Grid.Column="0" Text="Quantity"></TextBlock>
-            <controls:NumberBox Grid.Column="1" Value="{x:Bind Path=Count, Mode=TwoWay}" ValidationMode="InvalidInputOverwritten" Name="CountBox"/>
+            <controls:NumberBox Grid.Column="1" Value="{x:Bind Path=Count, Mode=TwoWay}" ValidationMode="InvalidInputOverwritten" Name="CountBox"
+                                SmallChange="1" LargeChange="5" SpinButtonPlacementMode="Compact"/>
         </Grid>
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
@@ -61,7 +62,8 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Name="PriceTextBlock" Text="Price"></TextBlock>
-            <controls:NumberBox Grid.Column="1" Value="{Binding Path=DoublePrice, Mode=TwoWay}" ValidationMode="InvalidInputOverwritten" Name="PriceBox"/>
+            <controls:NumberBox Grid.Column="1" Value="{Binding Path=DoublePrice, Mode=TwoWay}" ValidationMode="InvalidInputOverwritten" Name="PriceBox"
+                                SmallChange="1.00" LargeChange="10.00" SpinButtonPlacementMode="Compact"/>
         </Grid>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>

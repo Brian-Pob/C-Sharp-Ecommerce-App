@@ -80,9 +80,18 @@ namespace GUI_App
             var test = Products;
 
             AddToCartBtn.IsEnabled = false;
-            NavigationCacheMode = NavigationCacheMode.Required;
+            NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
+        override protected void OnNavigatedTo(NavigationEventArgs e)
+        {
+            if ((string)e.Parameter == "checkedout")
+            {
+                ShowChooseCartDialog();
+            }
+
+            NotifyPropertyChanged("Products");
+        }
 
         private async void ShowLoginDialog()
         {
@@ -357,7 +366,7 @@ namespace GUI_App
 
         private void ViewCartBtn_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(ViewCartPage));
+            Frame.Navigate(typeof(ViewCartPage), SelectedCart);
         }
 
         private void dg_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)

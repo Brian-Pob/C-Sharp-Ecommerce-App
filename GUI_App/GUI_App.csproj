@@ -131,6 +131,9 @@
     <Compile Include="Dialogs\LoginDialog.xaml.cs">
       <DependentUpon>LoginDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\RemoveItemFromCartDialog.xaml.cs">
+      <DependentUpon>RemoveItemFromCartDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\SaveCartDialog.xaml.cs">
       <DependentUpon>SaveCartDialog.xaml</DependentUpon>
     </Compile>
@@ -178,6 +181,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\LoginDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\RemoveItemFromCartDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

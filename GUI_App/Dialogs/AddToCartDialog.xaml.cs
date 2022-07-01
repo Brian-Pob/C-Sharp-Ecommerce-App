@@ -49,6 +49,7 @@ namespace GUI_App.Dialogs
                 CountText.Text = "Weight (lbs.) to add:";
             }
             CountBox.Header = $"Max: {MaxCount}";
+            CountBox.Maximum = MaxCount;
 
             /* TODO: Code for adding to cart should subtract from inventory service from within the cart service */
         }

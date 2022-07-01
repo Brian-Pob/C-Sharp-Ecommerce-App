@@ -1,4 +1,5 @@
-﻿using Library.GUI_App.Models;
+﻿using GUI_App.Dialogs;
+using Library.GUI_App.Models;
 using Library.GUI_App.Services;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
@@ -17,6 +18,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -46,6 +48,11 @@ namespace GUI_App.Pages
                 return new ObservableCollection<Product>(CartService.Current.Products);
             }
         }
+        private string SelectedCart { get; set; }
+        public Product SelectedProduct { get; set; }
+        public bool IsSelectedProduct { get { return SelectedProduct != null; } }
+        public bool IsCartNotEmpty { get { return Products.Count != 0; } }
+        public string CheckoutButtonText { get { return "Checkout (Subtotal: $" + CartService.Current.GetTotal() + ")"; } }
         public ViewCartPage()
         {
             this.InitializeComponent();
@@ -54,9 +61,15 @@ namespace GUI_App.Pages
             NotifyPropertyChanged("Products");
         }
 
+        override protected void OnNavigatedTo(NavigationEventArgs e)
+        {
+            SelectedCart = (string)e.Parameter;
+        }
+
         private void DG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
+            SelectedProduct = (sender as DataGrid).SelectedItem as Product;
+            NotifyPropertyChanged("IsSelectedProduct");
         }
 
 
@@ -222,9 +235,27 @@ namespace GUI_App.Pages
             Frame.GoBack();
         }
 
+        private async void RemoveItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new RemoveItemFromCartDialog(SelectedProduct);
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                NotifyPropertyChanged("Products");
+                NotifyPropertyChanged("CheckoutButtonText");
+                NotifyPropertyChanged("IsCartNotEmpty");
+                NotifyPropertyChanged("IsSelectedProduct");
+            }
+        }
+
         private void CheckoutButton_Click(object sender, RoutedEventArgs e)
         {
             
+            // Enter fake payment info
+            // Show subtotal and total
+            // Ensure BOGO works
+            // if checkout is successful, delete cart file
+            Frame.Navigate(typeof(MainPage), "checkedout");
         }
     }
 }
