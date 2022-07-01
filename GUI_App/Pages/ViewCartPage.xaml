@@ -47,6 +47,8 @@
                     <toolkit:DataGridTextColumn Header="Price ($)" Binding="{Binding Price}" Tag="Price" IsReadOnly="True"/>
                     <toolkit:DataGridTextColumn Header="Count" Binding="{Binding Count, Converter={StaticResource decimalConverter}}" Tag="Count" IsReadOnly="True"/>
                     <toolkit:DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Tag="Unit" IsReadOnly="True"/>
+                    <toolkit:DataGridTextColumn Header="Total Price" Binding="{Binding TotalPrice}" Tag="TotalPrice" IsReadOnly="True"/>
+
                 </toolkit:DataGrid.Columns>
             </toolkit:DataGrid>
         </Grid>

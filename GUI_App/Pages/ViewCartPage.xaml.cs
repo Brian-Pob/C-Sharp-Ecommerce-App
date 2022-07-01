@@ -201,17 +201,28 @@ namespace GUI_App.Pages
             {
                 if (e.Column.SortDirection == null || e.Column.SortDirection == DataGridSortDirection.Descending)
                 {
-                    dg.ItemsSource = new ObservableCollection<Product>(from p in Products
-                                                                       orderby p.Unit ascending
-                                                                       select p);
+                    dg.ItemsSource = new ObservableCollection<Product>(Products.OrderBy(p => (p is ProductByQuantity) ? ((ProductByQuantity)p).Unit : ((ProductByWeight)p).Unit));
                     e.Column.SortDirection = DataGridSortDirection.Ascending;
 
                 }
                 else
                 {
-                    dg.ItemsSource = new ObservableCollection<Product>(from p in Products
-                                                                       orderby p.Unit descending
-                                                                       select p);
+                    dg.ItemsSource = new ObservableCollection<Product>(Products.OrderByDescending(p => (p is ProductByQuantity) ? ((ProductByQuantity)p).Unit : ((ProductByWeight)p).Unit));
+                    e.Column.SortDirection = DataGridSortDirection.Descending;
+                }
+            }
+            
+            if (e.Column.Tag.ToString() == "TotalPrice")
+            {
+                if (e.Column.SortDirection == null || e.Column.SortDirection == DataGridSortDirection.Descending)
+                {
+                    dg.ItemsSource = new ObservableCollection<Product>(Products.OrderBy(p => (p is ProductByQuantity) ? ((ProductByQuantity)p).TotalPrice : ((ProductByWeight)p).TotalPrice));
+                    e.Column.SortDirection = DataGridSortDirection.Ascending;
+
+                }
+                else
+                {
+                    dg.ItemsSource = new ObservableCollection<Product>(Products.OrderByDescending(p => (p is ProductByQuantity) ? ((ProductByQuantity)p).TotalPrice : ((ProductByWeight)p).TotalPrice));
                     e.Column.SortDirection = DataGridSortDirection.Descending;
                 }
             }

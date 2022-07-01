@@ -203,7 +203,6 @@ namespace Library.GUI_App.Services
             }
         }
 
-        private string searchTerm;
         private ListNavigator<Product> searchListNavigator;
         public ListNavigator<Product> SearchListNavigator
         {
@@ -212,38 +211,57 @@ namespace Library.GUI_App.Services
                 return searchListNavigator;
             }
         }
+        
+        private string searchTerm;
+        public string SearchTerm
+        {
+            get
+            {
+                return searchTerm;
+            }
+
+            set
+            {
+                searchTerm = value;
+            }
+        }
+        public IEnumerable<Product> SearchResults
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(searchTerm))
+                {
+                    return null;
+                }
+                else
+                {
+
+                    var foundProducts = Products.Where(t => t.Name.ToLower().Contains(searchTerm.ToLower()));
+                    var temp = foundProducts;
+                    foundProducts = foundProducts.Concat(Products.Where(t => t.Description.ToLower().Contains(searchTerm.ToLower()) && !temp.Contains(t)));
+                    return foundProducts;
+                }
+            }
+        }
         public IEnumerable<Product> Search(string term)
         {
             IEnumerable<Product> foundProducts;
 
             if (!string.IsNullOrEmpty(term))
             {
-                searchTerm = term;
+                searchTerm = term; // if new term is not blank, replace saved searchTerm with new term
             }
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(searchTerm)) // if saved search term is not blank, use saved searchTerm
             {
                 foundProducts = Products.Where(t => t.Name.ToLower().Contains(searchTerm.ToLower()));
                 var temp = foundProducts;
                 foundProducts = foundProducts.Concat(Products.Where(t => t.Description.ToLower().Contains(searchTerm.ToLower()) && !temp.Contains(t)));
-            }
-            else
-            {
-                foundProducts = Products;
+                return foundProducts;
             }
 
-            switch (SortBy)
-            {
-                case 1:
-                    foundProducts = (foundProducts.OrderBy(t => t.Name)); break;
-                case 2:
-                    foundProducts = (foundProducts.OrderBy(t => t.Price)); break;
-                case 0:
-                default:
-                    foundProducts = (foundProducts.OrderBy(t => t.Id)); break;
-            }
-            searchListNavigator = new ListNavigator<Product>(foundProducts);
-            return foundProducts;
+            //if searchTerm is blank, return nothing
+            return null;
         }
     }
 }

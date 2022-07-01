@@ -94,22 +94,6 @@ namespace GUI_App
             NotifyPropertyChanged("Products");
         }
 
-        private async void ShowLoginDialog()
-        {
-            var dialog = new LoginDialog();
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                _loginType = LoginType.Employee;
-            }
-            else
-            {
-                _loginType = LoginType.Customer;
-                dg.IsReadOnly = true;
-                AddProductBtn.Visibility = Visibility.Collapsed;
-            }
-            LoginTypeBtn.Content = _loginType.ToString();
-        }
 
         private string cartPersistPath
             = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Carts\\";        
@@ -307,17 +291,13 @@ namespace GUI_App
             {
                 if (e.Column.SortDirection == null || e.Column.SortDirection == DataGridSortDirection.Descending)
                 {
-                    dg.ItemsSource = new ObservableCollection<Product>(from p in Products
-                                                                       orderby p.Unit ascending
-                                                                       select p);
+                    dg.ItemsSource = new ObservableCollection<Product>(Products.OrderBy(p => (p is ProductByQuantity) ? ((ProductByQuantity)p).Unit : ((ProductByWeight)p).Unit));
                     e.Column.SortDirection = DataGridSortDirection.Ascending;
 
                 }
                 else
                 {
-                    dg.ItemsSource = new ObservableCollection<Product>(from p in Products
-                                                                       orderby p.Unit descending
-                                                                       select p);
+                    dg.ItemsSource = new ObservableCollection<Product>(Products.OrderByDescending(p => (p is ProductByQuantity) ? ((ProductByQuantity)p).Unit : ((ProductByWeight)p).Unit));
                     e.Column.SortDirection = DataGridSortDirection.Descending;
                 }
             }
@@ -372,6 +352,25 @@ namespace GUI_App
 
         private void dg_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
+        }
+
+        private bool _isSearching = true;
+        private void SearchBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isSearching)
+            {
+                InventoryService.Current.SearchTerm = (SearchTextBox.Text);
+                _isSearching = false;
+                dg.ItemsSource = new ObservableCollection<Product>(InventoryService.Current.SearchResults);
+                SearchBtn.Content = "Clear";
+            }
+            else
+            {
+                _isSearching = true;
+                dg.ItemsSource = Products;
+                SearchBtn.Content = "Search";
+            }
+            
         }
     }
 

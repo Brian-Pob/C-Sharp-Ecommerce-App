@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Navigation;
 using Library.GUI_App.Services;
 using Library.GUI_App.Models;
 using Library.GUI_App.Utilities;
+using Windows.Globalization.NumberFormatting;
 
 // The Content Dialog item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -42,11 +43,13 @@ namespace GUI_App.Dialogs
             {
                 MaxCount = (double)(this.DataContext as ProductByQuantity).Count;
                 CountText.Text = "Qty. to add:";
+                UseQuantity();
             }
             else
             {
                 MaxCount = (double)(this.DataContext as ProductByWeight).Weight;
                 CountText.Text = "Weight (lbs.) to add:";
+                UseWeight();
             }
             CountBox.Header = $"Max: {MaxCount}";
             CountBox.Maximum = MaxCount;
@@ -85,6 +88,32 @@ namespace GUI_App.Dialogs
             {
                 IsPrimaryButtonEnabled = true;
             }
+        }
+
+        private void UseQuantity()
+        {
+            IncrementNumberRounder rounder = new IncrementNumberRounder();
+            rounder.Increment = 1;
+            rounder.RoundingAlgorithm = RoundingAlgorithm.RoundUp;
+
+            DecimalFormatter formatter = new DecimalFormatter();
+            formatter.IntegerDigits = 1;
+            formatter.FractionDigits = 0;
+            formatter.NumberRounder = rounder;
+            CountBox.NumberFormatter = formatter;
+        }
+
+        private void UseWeight()
+        {
+            IncrementNumberRounder rounder = new IncrementNumberRounder();
+            rounder.Increment = 0.01;
+            rounder.RoundingAlgorithm = RoundingAlgorithm.RoundDown;
+
+            DecimalFormatter formatter = new DecimalFormatter();
+            formatter.IntegerDigits = 1;
+            formatter.FractionDigits = 2;
+            formatter.NumberRounder = rounder;
+            CountBox.NumberFormatter = formatter;
         }
     }
 }
