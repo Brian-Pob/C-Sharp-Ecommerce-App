@@ -125,6 +125,9 @@
     <Compile Include="Dialogs\AddToCartDialog.xaml.cs">
       <DependentUpon>AddToCartDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\CheckoutDialog.xaml.cs">
+      <DependentUpon>CheckoutDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ChooseCartDialog.xaml.cs">
       <DependentUpon>ChooseCartDialog.xaml</DependentUpon>
     </Compile>
@@ -173,6 +176,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\AddToCartDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\CheckoutDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

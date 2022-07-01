@@ -195,8 +195,8 @@ namespace Library.GUI_App.Services
             return true;
         }
 
-        private string persistPath
-            = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Carts\\";
+        public string persistPath { get { return $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Carts\\"; } }
+
         public bool Save(string filename = "defaultcart.json")
         {
             var options = new JsonSerializerSettings

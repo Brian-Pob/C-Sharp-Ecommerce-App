@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -232,7 +233,8 @@ namespace GUI_App.Pages
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.GoBack();
+
+            Frame.Navigate(typeof(MainPage), null);
         }
 
         private async void RemoveItemButton_Click(object sender, RoutedEventArgs e)
@@ -248,14 +250,30 @@ namespace GUI_App.Pages
             }
         }
 
-        private void CheckoutButton_Click(object sender, RoutedEventArgs e)
+        private async void CheckoutButton_Click(object sender, RoutedEventArgs e)
         {
-            
+
             // Enter fake payment info
             // Show subtotal and total
             // Ensure BOGO works
             // if checkout is successful, delete cart file
-            Frame.Navigate(typeof(MainPage), "checkedout");
+            var subtotal = CartService.Current.GetTotal();
+            var taxrate = (decimal)0.075;
+            var total = subtotal + (subtotal * taxrate);
+            var dialog = new CheckoutDialog();
+            dialog.Title = $"Checkout (Tax: ${Decimal.Round(subtotal * taxrate, 2)}, Total: ${(Decimal.Round(total,2))})";
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                // delete cart file
+                if (!File.Exists(CartService.Current.persistPath + SelectedCart + ".json"))
+                    return;
+
+                File.Delete((CartService.Current.persistPath + SelectedCart + ".json"));
+                CartService.Current.Products.Clear();
+                NotifyPropertyChanged("Products");
+                Frame.Navigate(typeof(MainPage), "checkedout");
+            }
         }
     }
 }

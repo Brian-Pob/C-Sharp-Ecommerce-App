@@ -87,6 +87,7 @@ namespace GUI_App
         {
             if ((string)e.Parameter == "checkedout")
             {
+                InventoryService.Current.Save();
                 ShowChooseCartDialog();
             }
 
