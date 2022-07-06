@@ -38,6 +38,7 @@ namespace Library.GUI_App.Models
         public new decimal Count
         {
             get { return Weight; }
+            set { Weight = value; }
         }
 
         public new string Unit

@@ -28,7 +28,7 @@ namespace GUI_App.Dialogs
         private ObservableCollection<string> CartList { get; set; }
         private string _selectedCart;
 
-        private string SelectedCart
+        public string SelectedCart
         {
             get
             {
@@ -38,8 +38,13 @@ namespace GUI_App.Dialogs
                 }
                 else
                 {
-                    return _selectedCart + ".json";
+                    return _selectedCart;
                 }
+            }
+            
+            set
+            {
+                _selectedCart = value;
             }
         }
 
@@ -55,8 +60,8 @@ namespace GUI_App.Dialogs
 
             if (SelectedCart == null)
             {
-                Row0.Visibility = Visibility.Collapsed; // Hide Cart selector
-                Row1.Visibility = Visibility.Visible;   // Show Cart name textbox
+                Row0.Visibility = Visibility.Collapsed; // Hide Cart Text
+                Row1.Visibility = Visibility.Visible;   // Show New Cart name textbox
             }
             else
             {
@@ -71,7 +76,9 @@ namespace GUI_App.Dialogs
 
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+
             CartService.Current.Save(SelectedCart);
+            
         }
 
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

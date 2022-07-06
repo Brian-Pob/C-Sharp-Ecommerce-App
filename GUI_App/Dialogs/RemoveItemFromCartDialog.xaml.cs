@@ -78,13 +78,18 @@ namespace GUI_App.Dialogs
         {
             IncrementNumberRounder rounder = new IncrementNumberRounder();
             rounder.Increment = 1;
-            rounder.RoundingAlgorithm = RoundingAlgorithm.RoundUp;
+            rounder.RoundingAlgorithm = RoundingAlgorithm.RoundDown;
 
             DecimalFormatter formatter = new DecimalFormatter();
             formatter.IntegerDigits = 1;
             formatter.FractionDigits = 0;
             formatter.NumberRounder = rounder;
             CountBox.NumberFormatter = formatter;
+            CountBox.Minimum = 1;
+            // Default values:
+            // CountBox.SmallChange = 1
+            // CountBox.LargeChange = 5
+            
         }
 
         private void UseWeight()
@@ -98,8 +103,7 @@ namespace GUI_App.Dialogs
             formatter.FractionDigits = 2;
             formatter.NumberRounder = rounder;
             CountBox.NumberFormatter = formatter;
-            CountBox.SmallChange = 0.5;
-            CountBox.LargeChange = 5.0;
+            CountBox.Minimum = 0.01;
         }
 
         private void CountBox_ValueChanged(Microsoft.UI.Xaml.Controls.NumberBox sender, Microsoft.UI.Xaml.Controls.NumberBoxValueChangedEventArgs args)

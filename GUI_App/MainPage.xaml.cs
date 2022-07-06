@@ -321,8 +321,15 @@ namespace GUI_App
         {
             var dialog = new SaveCartDialog(SelectedCart);
             var result = await dialog.ShowAsync();
+
+
             if (result == ContentDialogResult.Primary)
             {
+                if (SelectedCart == null)
+                {
+                    // Set SelectedCart to most recently created cart file
+                    SelectedCart = dialog.SelectedCart;
+                }
                 InventoryService.Current.Save();
             }
         }
@@ -369,6 +376,7 @@ namespace GUI_App
                 _isSearching = true;
                 dg.ItemsSource = Products;
                 SearchBtn.Content = "Search";
+                SearchTextBox.Text = "";
             }
             
         }

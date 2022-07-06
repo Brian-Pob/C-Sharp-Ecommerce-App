@@ -276,15 +276,39 @@ namespace GUI_App.Pages
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
+                if (SelectedCart != null)
+                {
+                    if (!File.Exists(CartService.Current.persistPath + SelectedCart + ".json"))
+                        return;
+                    File.Delete((CartService.Current.persistPath + SelectedCart + ".json"));
+                }
                 // delete cart file
-                if (!File.Exists(CartService.Current.persistPath + SelectedCart + ".json"))
-                    return;
 
-                File.Delete((CartService.Current.persistPath + SelectedCart + ".json"));
                 CartService.Current.Products.Clear();
                 NotifyPropertyChanged("Products");
                 Frame.Navigate(typeof(MainPage), "checkedout");
             }
+        }
+
+        private bool _isSearching = true;
+
+        private void SearchBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isSearching)
+            {
+                CartService.Current.SearchTerm = (SearchTextBox.Text);
+                _isSearching = false;
+                dg.ItemsSource = new ObservableCollection<Product>(CartService.Current.SearchResults);
+                SearchBtn.Content = "Clear";
+            }
+            else
+            {
+                _isSearching = true;
+                dg.ItemsSource = Products;
+                SearchBtn.Content = "Search";
+                SearchTextBox.Text = "";
+            }
+
         }
     }
 }

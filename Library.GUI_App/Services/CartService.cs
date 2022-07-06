@@ -12,14 +12,6 @@ namespace Library.GUI_App.Services
 {
 	public class CartService
 	{
-        private ListNavigator<Product> listNavigator;
-        public ListNavigator<Product> ListNavigator
-        {
-            get
-            {
-                return listNavigator;
-            }
-        }
 		private InventoryService inventoryService;
 		public InventoryService InventoryService
 		{
@@ -60,7 +52,6 @@ namespace Library.GUI_App.Services
 		private CartService()
 		{
 			productList = new List<Product>();
-            listNavigator = new ListNavigator<Product>(productList);
         }
 
         public int NextId
@@ -224,16 +215,13 @@ namespace Library.GUI_App.Services
             var options = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
-
             };
+            
             try
             {
                 var inventoryJson = File.ReadAllText(persistPath + filename);
                 productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
-                listNavigator = new ListNavigator<Product>(SortedList);
                 return true;
-
-
             }
             catch (Exception)
             {
@@ -242,52 +230,6 @@ namespace Library.GUI_App.Services
                 return false;
             }
 
-        }
-
-        public void List(int choice = 0)
-        {
-            string sortBy;
-            switch (choice)
-            {
-                case 1: sortBy = "Name"; break;
-                case 2: sortBy = "TotalPrice"; break;
-                case 0:
-                default: sortBy = "Id"; break;
-            }
-
-            if (sortBy.Equals("Id"))
-            {
-                foreach (Product product in Products)
-                {
-                    Console.WriteLine(product);
-                    //Console.WriteLine("Debugging: " + product.GetType());
-                }
-            }
-            else if (sortBy.Equals("Name"))
-            {
-                foreach (Product product in Products.OrderBy(t => t.Name))
-                {
-                    Console.WriteLine(product);
-                    //Console.WriteLine("Debugging: " + product.GetType());
-                }
-            }
-            else if (sortBy.Equals("TotalPrice"))
-            {
-                foreach (Product product in Products.OrderBy(t => t.TotalPrice))
-                {
-                    Console.WriteLine(product);
-                    //Console.WriteLine("Debugging: " + product.GetType());
-                }
-            }
-        }
-
-        public void NavigateList()
-        {
-            var listWindow = listNavigator.GetCurrentPage();
-            foreach (var product in listWindow)
-            {
-                Console.WriteLine(product);
-            }
         }
 
         public decimal GetTotal()
@@ -301,47 +243,38 @@ namespace Library.GUI_App.Services
             return total;
         }
 
-        private int _sortBy;
-        public int SortBy
+        private string searchTerm;
+        public string SearchTerm
         {
             get
             {
-                return _sortBy;
+                return searchTerm;
             }
 
             set
             {
-                _sortBy = value;
-                listNavigator = new ListNavigator<Product>(SortedList);
-                var listCopy = new List<Product>(SortedList);
+                searchTerm = value;
             }
         }
-        public IEnumerable<Product> SortedList
+        public IEnumerable<Product> SearchResults
         {
             get
             {
-                switch (SortBy)
+                if (string.IsNullOrEmpty(searchTerm))
                 {
-                    case 1:
-                        return (Products.OrderBy(t => t.Name));
-                    case 2:
-                        return (Products.OrderBy(i => (i as ProductByQuantity)?.TotalPrice ?? (i as ProductByWeight)?.TotalPrice));
-                    case 0:
-                    default:
-                        return (Products.OrderBy(t => t.Id));
+                    return new List<Product>();
+                }
+                else
+                {
+
+                    var foundProducts = Products.Where(t => t.Name.ToLower().Contains(searchTerm.ToLower()));
+                    var temp = foundProducts;
+                    foundProducts = foundProducts.Concat(Products.Where(t => t.Description.ToLower().Contains(searchTerm.ToLower()) && !temp.Contains(t)));
+                    return foundProducts;
                 }
             }
         }
 
-        private string searchTerm;
-        private ListNavigator<Product> searchListNavigator;
-        public ListNavigator<Product> SearchListNavigator
-        {
-            get
-            {
-                return searchListNavigator;
-            }
-        }
         public IEnumerable<Product> Search(string term)
         {
             IEnumerable<Product> foundProducts;
@@ -362,18 +295,7 @@ namespace Library.GUI_App.Services
                 foundProducts = Products;
             }
 
-            switch (SortBy)
-            {
-                case 1:
-                    foundProducts = (foundProducts.OrderBy(t => t.Name)); break;
-                case 2:
-                    foundProducts = (foundProducts.OrderBy(i => (i as ProductByQuantity)?.TotalPrice ?? (i as ProductByWeight)?.TotalPrice)); break;
-                case 0:
-                default:
-                    foundProducts = (foundProducts.OrderBy(t => t.Id)); break;
-            }
             
-            searchListNavigator = new ListNavigator<Product>(foundProducts);
             return foundProducts;
         }
 

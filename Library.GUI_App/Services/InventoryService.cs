@@ -12,14 +12,6 @@ namespace Library.GUI_App.Services
 {
 	public class InventoryService
 	{
-        private ListNavigator<Product> listNavigator;
-        public ListNavigator<Product> ListNavigator
-        {
-            get
-            {
-                return listNavigator;
-            }
-        }
         private CartService cartService;
 		public CartService CartService
         {
@@ -60,7 +52,6 @@ namespace Library.GUI_App.Services
 		private InventoryService()
 		{
             productList = new List<Product>();
-            listNavigator = new ListNavigator<Product>(SortedList);
 		}
 
         public int NextId
@@ -158,7 +149,6 @@ namespace Library.GUI_App.Services
             {
                 var inventoryJson = File.ReadAllText(persistPath+filename);
                 productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
-                listNavigator = new ListNavigator<Product>(SortedList);      
                 return true;
 
 
@@ -170,46 +160,6 @@ namespace Library.GUI_App.Services
                 return false;
             }            
             
-        }
-
-        private int _sortBy;
-        public int SortBy
-        {
-            get
-            {
-                return _sortBy;
-            }
-
-            set
-            {
-                _sortBy = value;
-                listNavigator = new ListNavigator<Product>(SortedList);
-            }
-        }
-        public IEnumerable<Product> SortedList
-        {
-            get
-            {
-                switch (SortBy)
-                {
-                    case 1:
-                        return (Products.OrderBy(t => t.Name));
-                    case 2:
-                        return (Products.OrderBy(t => t.Price));
-                    case 0:
-                    default:
-                        return (Products.OrderBy(t => t.Id));
-                }
-            }
-        }
-
-        private ListNavigator<Product> searchListNavigator;
-        public ListNavigator<Product> SearchListNavigator
-        {
-            get
-            {
-                return searchListNavigator;
-            }
         }
         
         private string searchTerm;
@@ -231,7 +181,7 @@ namespace Library.GUI_App.Services
             {
                 if (string.IsNullOrEmpty(searchTerm))
                 {
-                    return null;
+                    return new List<Product>();
                 }
                 else
                 {
