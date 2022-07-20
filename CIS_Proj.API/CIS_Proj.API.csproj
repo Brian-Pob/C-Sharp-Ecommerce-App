@@ -11,4 +11,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Library.Standard.CIS_Proj">
+      <HintPath>..\Library.Standard.CIS_Proj\bin\Debug\netstandard2.0\Library.Standard.CIS_Proj.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
