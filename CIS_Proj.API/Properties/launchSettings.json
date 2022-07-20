@@ -4,20 +4,20 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:23982",
+      "applicationUrl": "http://localhost:4725",
       "sslPort": 44335
     }
   },
   "profiles": {
-    "CIS_Proj.API": {
+    "TaskApplication.API": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7106;http://localhost:5106",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:5017",
+      "dotnetRunMessages": true
     },
     "IIS Express": {
       "commandName": "IISExpress",
