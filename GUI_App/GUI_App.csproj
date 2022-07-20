@@ -228,6 +228,10 @@
       <Project>{86f19899-308e-43a4-bf44-8938be008fcd}</Project>
       <Name>Library.GUI_App</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Library.Standard.CIS_Proj\Library.Standard.CIS_Proj.csproj">
+      <Project>{b1cf9be7-a97c-4f5f-8680-c94ff6cf0ef7}</Project>
+      <Name>Library.Standard.CIS_Proj</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

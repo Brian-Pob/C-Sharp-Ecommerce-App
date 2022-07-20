@@ -51,8 +51,12 @@ namespace Library.GUI_App.Services
         
 		private InventoryService()
 		{
-            productList = new List<Product>();
-		}
+            var weightProductsJson = new WebRequestHandler().Get("http://localhost:5017/api/ProductByWeight").Result;
+            productList = JsonConvert.DeserializeObject<List<Product>>(weightProductsJson);
+            var quantityProductsJson = new WebRequestHandler().Get("http://localhost:5017/api/ProductByQuantity").Result;
+            productList.AddRange(JsonConvert.DeserializeObject<List<Product>>(quantityProductsJson));
+            //productList = new List<Product>();
+        }
 
         public int NextId
         {
