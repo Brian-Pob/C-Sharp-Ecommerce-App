@@ -25,8 +25,8 @@ namespace CIS_Proj.API.Controllers
         }
 
         // POST api/<ValuesController>
-        [HttpPost("Create")]
-        public ProductByQuantity Create(ProductByQuantity productByQuantity)
+        [HttpPost("AddOrUpdate")]
+        public ProductByQuantity AddOrUpdate(ProductByQuantity productByQuantity)
         {
             if (productByQuantity.Id == -1)
             {

@@ -96,7 +96,7 @@ namespace Library.GUI_App.Services
             {
 
                 ProductByWeight productByWeight = (ProductByWeight)product;
-                ProductByWeight inventoryProductByWeight = (ProductByWeight)InventoryService.Products.Where(t => t.Id == productByWeight.Id).First();
+                ProductByWeight inventoryProductByWeight = (ProductByWeight)InventoryService.Products.FirstOrDefault(p => p.Id == productByWeight.Id);
                 if (inventoryProductByWeight.Weight < productByWeight.Weight)
                 {
                     Console.WriteLine("Not enough weight in inventory. Nothing added to cart.");
@@ -105,12 +105,15 @@ namespace Library.GUI_App.Services
                 else
                 {
                     inventoryProductByWeight.Weight -= productByWeight.Weight;
+                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/AddOrUpdate", inventoryProductByWeight).Result;
+                    var newProductByWeight = JsonConvert.DeserializeObject<ProductByWeight>(response);
+
                 }
             }
             else if (product is ProductByQuantity)
             {
                 ProductByQuantity productByQuantity = (ProductByQuantity)product;
-                ProductByQuantity inventoryProductByQuantity = (ProductByQuantity)InventoryService.Products.Where(t => t.Id == productByQuantity.Id).First();
+                ProductByQuantity inventoryProductByQuantity = (ProductByQuantity)InventoryService.Products.FirstOrDefault(p => p.Id == productByQuantity.Id);
                 if (inventoryProductByQuantity.Quantity < productByQuantity.Quantity)
                 {
                     Console.WriteLine("Not enough quantity in inventory. Nothing added to cart.");
@@ -119,10 +122,12 @@ namespace Library.GUI_App.Services
                 else
                 {
                     inventoryProductByQuantity.Quantity -= productByQuantity.Quantity;
+                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/AddOrUpdate", inventoryProductByQuantity).Result;
+                    var newProductByQuantity = JsonConvert.DeserializeObject<ProductByQuantity>(response);
                 }
             }
 
-            // Finished subtracting amount from inventory. Now to add to the cart productList
+            // Finished subtracting amount from inventory and updating inventory in database. Now to add to the cart productList
 
             var cartProduct = Products.Find(t => t.Id == product.Id); // if product does not exist in cart
             if (cartProduct == null)
@@ -130,21 +135,18 @@ namespace Library.GUI_App.Services
                 if (product is ProductByWeight)
                 {
                     var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{_cartName}", product).Result;
-                    // POST to api/ProdcutByWeight/Carts/{cartName}
-                    // This will search through the cartlist in the DB for the item
-                    // Make sure to check that the Key and List pair exist
-                    // If the list does not exist, create it
-                    // After the list is created, or if it already exists, search through the list for the passed product
-                    // If the product is found in the cart, update the count
-                    // If the product is not found, add it to the list
-                    // Now the list in the Database is updated
+                   
+                    var newProduct = JsonConvert.DeserializeObject<Product>(response);
 
-                    var newProductList = JsonConvert.DeserializeObject<List<Product>>(response);
-                    // newProductList contains the result of the POST
-                    // the result should be the new updated list
-                    // now set the productList to the updated list
+                    productList.Add(newProduct);
+                }
+                else if (product is ProductByQuantity)
+                {
+                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{_cartName}", product).Result;
 
-                    productList = newProductList;
+                    var newProduct = JsonConvert.DeserializeObject<Product>(response);
+
+                    productList.Add(newProduct);
                 }
                 Console.WriteLine("New product added successfully.");
             }
@@ -155,18 +157,22 @@ namespace Library.GUI_App.Services
                 if (product is ProductByWeight)
                 {
                     Console.WriteLine("Updating weight.");
-                    ((ProductByWeight)cartProduct).Weight += ((ProductByWeight)product).Weight; // weight in productList is updated
-                    // POST to api/ProdcutByWeight/Carts/{cartName}
-                    // This will remove the list associated with that Key and replace it with the current list
-                    // Now the list in the Database is updated
+                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{_cartName}", product).Result;
+
+                    var newProduct = JsonConvert.DeserializeObject<Product>(response);
+
+                    productList.Remove(cartProduct);
+                    productList.Add(newProduct);
                 }
                 else if (product is ProductByQuantity)
                 {
                     Console.WriteLine("Updating quantity.");
-                    ((ProductByQuantity)cartProduct).Quantity += ((ProductByQuantity)product).Quantity; // quantity in productList is updated
-                    // POST to api/ProductByQuantity/Carts/{cartName}
-                    // This will remove the list associated with that Key and replace it with the current list
-                    // Now the list in the Database is updated
+                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{_cartName}", product).Result;
+
+                    var newProduct = JsonConvert.DeserializeObject<Product>(response);
+
+                    productList.Remove(cartProduct);
+                    productList.Add(newProduct);
                 }
             }
 

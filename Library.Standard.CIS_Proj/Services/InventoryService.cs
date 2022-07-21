@@ -99,7 +99,7 @@ namespace Library.GUI_App.Services
             
             if (product is ProductByWeight)
             {
-                var response = new WebRequestHandler().Post("http://localhost:5017/api/ProductByWeight/Create", product).Result;
+                var response = new WebRequestHandler().Post("http://localhost:5017/api/ProductByWeight/AddOrUpdate", product).Result;
                 var newProduct = JsonConvert.DeserializeObject<Product>(response);
 
                 var old = Products.FirstOrDefault(t => t.Id == newProduct.Id);
@@ -118,7 +118,7 @@ namespace Library.GUI_App.Services
             }
             else if (product is ProductByQuantity)
             {
-                var response = new WebRequestHandler().Post("http://localhost:5017/api/ProductByQuantity/Create", product).Result;
+                var response = new WebRequestHandler().Post("http://localhost:5017/api/ProductByQuantity/AddOrUpdate", product).Result;
                 var newProduct = JsonConvert.DeserializeObject<Product>(response);
 
                 var old = Products.FirstOrDefault(t => t.Id == newProduct.Id);

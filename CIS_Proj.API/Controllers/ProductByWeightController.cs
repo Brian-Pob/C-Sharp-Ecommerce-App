@@ -26,8 +26,8 @@ namespace CIS_Proj.API.Controllers
         }
 
         // POST api/<ProductByWeightController>
-        [HttpPost("Create")]
-        public ProductByWeight Create(ProductByWeight productByWeight)
+        [HttpPost("AddOrUpdate")]
+        public ProductByWeight AddOrUpdate(ProductByWeight productByWeight)
         {
             if (productByWeight.Id == -1)
             {
