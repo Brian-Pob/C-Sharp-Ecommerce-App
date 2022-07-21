@@ -19,10 +19,10 @@ namespace CIS_Proj.API.Controllers
         }
 
         // GET api/<ProductByWeightController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("Carts/{name}")]
+        public List<ProductByWeight> Get(string name)
         {
-            return "value";
+            return new ProductByWeightEC().Get(name);
         }
 
         // POST api/<ProductByWeightController>

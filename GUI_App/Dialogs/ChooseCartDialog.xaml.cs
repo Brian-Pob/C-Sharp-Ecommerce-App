@@ -1,4 +1,7 @@
-﻿using Library.GUI_App.Services;
+﻿using Library.GUI_App.Models;
+using Library.GUI_App.Services;
+using Library.Standard.CIS_Proj.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,13 +42,14 @@ namespace GUI_App.Dialogs
         {
             this.InitializeComponent();
             DataContext = this;
-            // Count number of files in persistPath
-            var files = Directory.GetFiles(persistPath);
             CartList = new ObservableCollection<string>();
-            foreach (var file in files)
-            {
-                CartList.Add(Path.GetFileName(file));
+            
+            var cartsJson = new WebRequestHandler().Get("http://localhost:5017/api/Carts").Result;
+            var cartsList = JsonConvert.DeserializeObject<Dictionary<string, List<Product>>>(cartsJson);
+            foreach (var c in cartsList) {
+                CartList.Add(c.Key);
             }
+            
             NotifyPropertyChanged("CartList");
             CartComboBox.ItemsSource = CartList;
             CartComboBox.SelectedIndex = 0;
@@ -54,7 +58,9 @@ namespace GUI_App.Dialogs
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             CartService.Current.Load(CartList[CartComboBox.SelectedIndex]);
-            SelectedCart = CartList[CartComboBox.SelectedIndex].Replace(".json", "");
+            //SelectedCart = CartList[CartComboBox.SelectedIndex].Replace(".json", "");
+            SelectedCart = CartList[CartComboBox.SelectedIndex];
+
         }
 
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

@@ -9,5 +9,19 @@ namespace CIS_Proj.API.EC
         {
             return FakeProductDatabase.WeightProducts;
         }
+
+        public List<ProductByWeight> Get(string name)
+        {
+            var tempList = FakeProductDatabase.Carts[name];
+            List<ProductByWeight> tempList2 = new List<ProductByWeight>();
+            tempList.ForEach(p =>
+            {
+                if (p is ProductByWeight)
+                {
+                    tempList2.Add(p as ProductByWeight);
+                }
+            });
+            return tempList2;
+        }
     }
 }

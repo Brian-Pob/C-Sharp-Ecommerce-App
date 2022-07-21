@@ -18,10 +18,10 @@ namespace CIS_Proj.API.Controllers
         }
 
         // GET api/<ValuesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("Carts/{name}")]
+        public List<ProductByQuantity> Get(string name)
         {
-            return "value";
+            return new ProductByQuantityEC().Get(name);
         }
 
         // POST api/<ValuesController>

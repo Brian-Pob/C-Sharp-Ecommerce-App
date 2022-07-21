@@ -17,6 +17,39 @@ namespace CIS_Proj.API.Database
             }
         }
 
+        private static Dictionary<string, List<Product>> _carts = new Dictionary<string, List<Product>>();
+        public static Dictionary<string, List<Product>> Carts
+        {
+            get
+            {
+                if (_carts.Count == 0)
+                {
+                    _carts = new Dictionary<string, List<Product>>();
+                    var testList = new List<Product>();
+                    testQList.ForEach(testList.Add);
+                    _carts.Add("default", testList);
+
+                    var otherTestList = new List<Product>();
+                    testQList.ForEach(otherTestList.Add);
+                    testWList.ForEach(otherTestList.Add);
+                    _carts.Add("other", otherTestList);
+                }
+                return _carts;
+            }
+        }
+
+        public static List<ProductByQuantity> testQList = new List<ProductByQuantity>
+        {
+            new ProductByQuantity { Id=3, Name="Cheese Pizza", Description="Slice of cheese pizza", Quantity=999, Price=1.00m},
+        };
+
+        public static List<ProductByWeight> testWList = new List<ProductByWeight>
+        {
+            new ProductByWeight { Id=0, Name="Apple", Description="Bag of apples", Weight=420, Price=1.00m},
+            new ProductByWeight { Id=1, Name="Bananas", Description="Bag of bananas", Weight=69, Price=2.00m},
+            new ProductByWeight { Id=2, Name="Carrots", Description="Bag of carrots", Weight=25, Price=1.50m},
+        };
+
         public static List<ProductByWeight> WeightProducts = new List<ProductByWeight>
         {
             new ProductByWeight { Id=0, Name="Apple", Description="Bag of apples", Weight=1, Price=1.00m},

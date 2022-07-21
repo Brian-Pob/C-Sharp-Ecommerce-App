@@ -210,17 +210,24 @@ namespace Library.GUI_App.Services
             }
         }
 
-        public bool Load(string filename = "defaultcart.json")
+        public bool Load(string cartName)
         {
             var options = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
             };
-            
+
             try
             {
-                var inventoryJson = File.ReadAllText(persistPath + filename);
-                productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
+                var weightProductsJson = new WebRequestHandler().Get($"http://localhost:5017/api/ProductByWeight/Carts/{cartName}").Result;
+                productList = JsonConvert.DeserializeObject<List<Product>>(weightProductsJson);
+                var quantityProductsJson = new WebRequestHandler().Get($"http://localhost:5017/api/ProductByQuantity/Carts/{cartName}").Result;
+                productList.AddRange(JsonConvert.DeserializeObject<List<Product>>(quantityProductsJson));
+                
+                //var cartsJson = new WebRequestHandler().Get("http://localhost:5017/api/Carts").Result;
+                //var cartsDictionary = JsonConvert.DeserializeObject<Dictionary<string, List<Product>>>(cartsJson);
+                //var selectedCart = cartsDictionary[cartName];
+                //productList = selectedCart;
                 return true;
             }
             catch (Exception)
@@ -235,7 +242,7 @@ namespace Library.GUI_App.Services
         public decimal GetTotal()
         {
             decimal total = 0;
-            foreach(Product product in Products)
+            foreach(var product in Products)
             {
                 total += (product is ProductByWeight ? (product as ProductByWeight).TotalPrice : (product as ProductByQuantity).TotalPrice);
             }
