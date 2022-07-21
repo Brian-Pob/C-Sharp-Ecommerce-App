@@ -362,20 +362,31 @@ namespace GUI_App
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
-                
                 var product = e.Row.DataContext as Product;
-                var iProduct = _InventoryService.Products.FirstOrDefault(p => p.Id == product.Id);
-                if (iProduct is ProductByQuantity)
+                var cell = e.EditingElement as TextBox;
+                var dataType = product.GetType().GetProperty(e.Column.Tag.ToString()).PropertyType.Name;
+                switch (dataType)
                 {
-                    // do something
-                }
-                else if (iProduct is ProductByWeight)
-                {
-                    // do something
-                }
+                    case "Int32":
+                        product.GetType().GetProperty(e.Column.Tag.ToString()).SetValue(product, int.Parse(cell.Text));
+                        break;
+                    case "Double":
+                        product.GetType().GetProperty(e.Column.Tag.ToString()).SetValue(product, double.Parse(cell.Text));
+                        break;
+                    case "Decimal":
+                        product.GetType().GetProperty(e.Column.Tag.ToString()).SetValue(product, decimal.Parse(cell.Text));
+                        break;
+                    case "Boolean":
+                        var cb1 = e.EditingElement as CheckBox;
+                        product.GetType().GetProperty(e.Column.Tag.ToString()).SetValue(product, cb1.IsChecked);
+                        break;
+                    case "String":
+                        product.GetType().GetProperty(e.Column.Tag.ToString()).SetValue(product, cell.Text);
+                        break;
+                };
+                _InventoryService.Create(product);
 
-                _InventoryService.Create(iProduct);
-                
+
             }
         }
 

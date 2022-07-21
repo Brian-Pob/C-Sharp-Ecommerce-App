@@ -56,20 +56,20 @@ namespace Library.GUI_App.Services
             var quantityProductsJson = new WebRequestHandler().Get("http://localhost:5017/api/ProductByQuantity").Result;
             productList.AddRange(JsonConvert.DeserializeObject<List<Product>>(quantityProductsJson));
 
-            int qcount = 0, wcount = 0;
-            foreach (Product p in productList)
-            {
-                if (p is ProductByQuantity)
-                {
-                    // do something
-                    qcount++;
-                }
-                else if (p is ProductByWeight)
-                {
-                    // do something
-                    wcount++;
-                }
-            }
+            //int qcount = 0, wcount = 0;
+            //foreach (Product p in productList)
+            //{
+            //    if (p is ProductByQuantity)
+            //    {
+            //        // do something
+            //        qcount++;
+            //    }
+            //    else if (p is ProductByWeight)
+            //    {
+            //        // do something
+            //        wcount++;
+            //    }
+            //}
             //productList = new List<Product>();
         }
 
