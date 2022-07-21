@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Library.Standard.CIS_Proj.Utilities;
+using Newtonsoft.Json;
 
 namespace Library.GUI_App.Models
 {
+    [JsonConverter(typeof(ProductJsonConverter))]
     public partial class ProductByQuantity : Product
     {
         public int Quantity { get; set; }

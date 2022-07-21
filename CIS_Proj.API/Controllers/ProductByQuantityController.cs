@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Library.GUI_App.Models;
 using CIS_Proj.API.Database;
+using CIS_Proj.API.EC;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CIS_Proj.API.Controllers
@@ -13,7 +14,7 @@ namespace CIS_Proj.API.Controllers
         [HttpGet]
         public List<ProductByQuantity> Get()
         {
-            return FakeProductDatabase.QuantityProducts;
+            return new ProductByQuantityEC().Get();
         }
 
         // GET api/<ValuesController>/5

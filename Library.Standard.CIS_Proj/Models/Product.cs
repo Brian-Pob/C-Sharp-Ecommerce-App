@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Library.Standard.CIS_Proj.Utilities;
+using Newtonsoft.Json;
+using System;
 namespace Library.GUI_App.Models
 {
+	[JsonConverter(typeof(ProductJsonConverter))]
 	public class Product
 	{
 		public int Id { get; set; }
