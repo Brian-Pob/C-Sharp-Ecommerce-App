@@ -49,7 +49,7 @@ namespace GUI_App.Dialogs
                 qdc.Price = dc.Price;
                 qdc.Quantity = (int)CountBox.Value;
                 qdc.IsBogo = (bool)(BogoCb as CheckBox).IsChecked;
-                InventoryService.Current.Create(qdc.Clone());
+                InventoryService.Current.AddOrUpdate(qdc.Clone());
             }
             else if(productType == ProductType.Weight)
             {
@@ -59,7 +59,7 @@ namespace GUI_App.Dialogs
                 wdc.Price = dc.Price;
                 wdc.Weight = (decimal)CountBox.Value;
                 wdc.IsBogo = (bool)(BogoCb as CheckBox).IsChecked;
-                InventoryService.Current.Create(wdc.Clone());
+                InventoryService.Current.AddOrUpdate(wdc.Clone());
             }
 
         }

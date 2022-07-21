@@ -89,7 +89,7 @@ namespace Library.GUI_App.Services
         
         
         /* CRUD methods */
-        public bool Create(Product product) // Does Add and Update
+        public bool AddOrUpdate(Product product) // Does Add and Update
         {
             //if (product == null || string.IsNullOrWhiteSpace(product.Name) || string.IsNullOrWhiteSpace(product.Description) || product.Price < 0 ||
             //((product as ProductByWeight)?.Weight ?? (product as ProductByQuantity)?.Quantity) < 0)

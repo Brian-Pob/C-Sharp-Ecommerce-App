@@ -12,6 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Library.GUI_App">
+      <HintPath>..\Library.GUI_App\bin\Debug\Library.GUI_App.dll</HintPath>
+    </Reference>
     <Reference Include="Library.Standard.CIS_Proj">
       <HintPath>..\Library.Standard.CIS_Proj\bin\Debug\netstandard2.0\Library.Standard.CIS_Proj.dll</HintPath>
     </Reference>

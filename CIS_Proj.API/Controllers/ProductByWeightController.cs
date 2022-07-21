@@ -45,6 +45,13 @@ namespace CIS_Proj.API.Controllers
             return productByWeight;
         }
 
+        [HttpPost("Carts/{cartName}")]
+        public ProductByWeight AddOrUpdate(string cartName, ProductByWeight productByWeight)
+        {
+            return new ProductByWeightEC().AddOrUpdate(cartName, productByWeight);
+
+        }
+
         // PUT api/<ProductByWeightController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)

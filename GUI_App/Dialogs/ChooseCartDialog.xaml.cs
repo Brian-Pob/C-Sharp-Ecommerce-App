@@ -45,8 +45,8 @@ namespace GUI_App.Dialogs
             CartList = new ObservableCollection<string>();
             
             var cartsJson = new WebRequestHandler().Get("http://localhost:5017/api/Carts").Result;
-            var cartsList = JsonConvert.DeserializeObject<Dictionary<string, List<Product>>>(cartsJson);
-            foreach (var c in cartsList) {
+            var cartsDict = JsonConvert.DeserializeObject<Dictionary<string, List<Product>>>(cartsJson);
+            foreach (var c in cartsDict) {
                 CartList.Add(c.Key);
             }
             

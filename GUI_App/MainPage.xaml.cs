@@ -22,6 +22,8 @@ using GUI_App.Dialogs;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using GUI_App.Pages;
 using Windows.UI.Popups;
+using Library.Standard.CIS_Proj.Utilities;
+using Newtonsoft.Json;
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace GUI_App
@@ -71,10 +73,10 @@ namespace GUI_App
 
             // if cartPersistPath directory does not exist, create it
 
-            if (!Directory.Exists(cartPersistPath))
-            {
-                Directory.CreateDirectory(cartPersistPath);
-            }
+            //if (!Directory.Exists(cartPersistPath))
+            //{
+            //    Directory.CreateDirectory(cartPersistPath);
+            //}
 
             ShowChooseCartDialog();
             NotifyPropertyChanged("Products");
@@ -104,8 +106,9 @@ namespace GUI_App
 
             try
             {
-                var files = Directory.GetFiles(cartPersistPath);
-                if (files.Length == 0)
+                var cartsJson = new WebRequestHandler().Get("http://localhost:5017/api/Carts").Result;
+                var cartsDict = JsonConvert.DeserializeObject<Dictionary<string, List<Product>>>(cartsJson);
+                if (cartsDict.Count == 0) // if no carts are found in the db, default to creating a new cart
                     return;
             }
             catch (Exception)
@@ -384,7 +387,7 @@ namespace GUI_App
                         product.GetType().GetProperty(e.Column.Tag.ToString()).SetValue(product, cell.Text);
                         break;
                 };
-                _InventoryService.Create(product);
+                _InventoryService.AddOrUpdate(product);
 
 
             }
