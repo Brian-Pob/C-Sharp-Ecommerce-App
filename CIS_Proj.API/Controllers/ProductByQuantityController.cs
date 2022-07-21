@@ -24,9 +24,23 @@ namespace CIS_Proj.API.Controllers
         }
 
         // POST api/<ValuesController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("Create")]
+        public ProductByQuantity Create(ProductByQuantity productByQuantity)
         {
+            if (productByQuantity.Id == -1)
+            {
+                productByQuantity.Id = FakeProductDatabase.NextId();
+                FakeProductDatabase.QuantityProducts.Add(productByQuantity);
+                return productByQuantity;
+            }
+
+            var productToUpdate = FakeProductDatabase.QuantityProducts.FirstOrDefault(p => p.Id == productByQuantity.Id);
+            if (productToUpdate != null)
+            {
+                FakeProductDatabase.QuantityProducts.Remove(productToUpdate);
+                FakeProductDatabase.QuantityProducts.Add(productByQuantity);
+            }
+            return productByQuantity;
         }
 
         // PUT api/<ValuesController>/5

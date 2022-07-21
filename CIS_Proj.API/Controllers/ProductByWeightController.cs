@@ -25,9 +25,23 @@ namespace CIS_Proj.API.Controllers
         }
 
         // POST api/<ProductByWeightController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("Create")]
+        public ProductByWeight Create(ProductByWeight productByWeight)
         {
+            if (productByWeight.Id == -1)
+            {
+                productByWeight.Id = FakeProductDatabase.NextId();
+                FakeProductDatabase.WeightProducts.Add(productByWeight);
+                return productByWeight;
+            }
+
+            var productToUpdate = FakeProductDatabase.WeightProducts.FirstOrDefault(p => p.Id == productByWeight.Id);
+            if (productToUpdate != null)
+            {
+                FakeProductDatabase.WeightProducts.Remove(productToUpdate);
+                FakeProductDatabase.WeightProducts.Add(productByWeight);
+            }
+            return productByWeight;
         }
 
         // PUT api/<ProductByWeightController>/5

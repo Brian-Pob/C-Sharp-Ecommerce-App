@@ -21,6 +21,7 @@ using Library.GUI_App.Utilities;
 using GUI_App.Dialogs;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using GUI_App.Pages;
+using Windows.UI.Popups;
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace GUI_App
@@ -359,6 +360,23 @@ namespace GUI_App
 
         private void dg_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
+            if (e.EditAction == DataGridEditAction.Commit)
+            {
+                
+                var product = e.Row.DataContext as Product;
+                var iProduct = _InventoryService.Products.FirstOrDefault(p => p.Id == product.Id);
+                if (iProduct is ProductByQuantity)
+                {
+                    // do something
+                }
+                else if (iProduct is ProductByWeight)
+                {
+                    // do something
+                }
+
+                _InventoryService.Create(iProduct);
+                
+            }
         }
 
         private bool _isSearching = true;

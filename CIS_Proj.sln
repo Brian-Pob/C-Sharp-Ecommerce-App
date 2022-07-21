@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI_App", "GUI_App\GUI_App.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.GUI_App", "Library.GUI_App\Library.GUI_App.csproj", "{86F19899-308E-43A4-BF44-8938BE008FCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Standard.CIS_Proj", "Library.Standard.CIS_Proj\Library.Standard.CIS_Proj.csproj", "{B1CF9BE7-A97C-4F5F-8680-C94FF6CF0EF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library.Standard.CIS_Proj", "Library.Standard.CIS_Proj\Library.Standard.CIS_Proj.csproj", "{B1CF9BE7-A97C-4F5F-8680-C94FF6CF0EF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

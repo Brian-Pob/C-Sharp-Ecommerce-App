@@ -55,6 +55,18 @@ namespace Library.GUI_App.Services
             productList = JsonConvert.DeserializeObject<List<Product>>(weightProductsJson);
             var quantityProductsJson = new WebRequestHandler().Get("http://localhost:5017/api/ProductByQuantity").Result;
             productList.AddRange(JsonConvert.DeserializeObject<List<Product>>(quantityProductsJson));
+            
+            //foreach(Product p in productList)
+            //{
+            //    if(p is ProductByQuantity)
+            //    {
+            //        // do something
+            //    }
+            //    else if (p is ProductByWeight)
+            //    {
+            //        // do something
+            //    }
+            //}
             //productList = new List<Product>();
         }
 
@@ -74,49 +86,70 @@ namespace Library.GUI_App.Services
         
         
         /* CRUD methods */
-        public bool Create(Product product)
+        public bool Create(Product product) // Does Add and Update
         {
-            if (product == null || string.IsNullOrWhiteSpace(product.Name) || string.IsNullOrWhiteSpace(product.Description) || product.Price < 0 || 
-                ((product as ProductByQuantity)?.Quantity ?? (product as ProductByWeight)?.Weight) < 0)
-            {
-                return false;
-            }
+            //if (product == null || string.IsNullOrWhiteSpace(product.Name) || string.IsNullOrWhiteSpace(product.Description) || product.Price < 0 ||
+            //((product as ProductByWeight)?.Weight ?? (product as ProductByQuantity)?.Quantity) < 0)
+            //{
+            //    return false;
+            //}
             
-            product.Id = NextId;
-            Products.Add(product);
-            return true;
-        }
-
-        public bool Update(Product product)
-        {
-            for(int i = 0; i < Products.Count; i++)
+            if (product is ProductByWeight)
             {
-                if(Products[i].Id == product.Id)
+                var response = new WebRequestHandler().Post("http://localhost:5017/api/ProductByWeight/Create", product).Result;
+                var newProduct = JsonConvert.DeserializeObject<Product>(response);
+
+                var old = Products.FirstOrDefault(t => t.Id == newProduct.Id);
+                if (old != null)
                 {
-                    Console.WriteLine("Found matching product. Updating information.");
-                    Products[i] = product;
+                    var index = productList.IndexOf(old);
+                    productList.RemoveAt(index);
+                    productList.Insert(index, newProduct);
+                    return true;
+                }
+                else
+                {
+                    productList.Add(newProduct);
                     return true;
                 }
             }
-            Console.WriteLine("Product ID not found. Nothing was updated.");
-            return false;
-        }
-
-        public bool UpdateProductQuantity(ProductByQuantity product)
-        {
-            for(int i = 0; i < Products.Count; i++)
+            else if (product is ProductByQuantity)
             {
-                if(Products[i].Id == product.Id)
+                var response = new WebRequestHandler().Post("http://localhost:5017/api/ProductByQuantity/Create", product).Result;
+                var newProduct = JsonConvert.DeserializeObject<Product>(response);
+
+                var old = Products.FirstOrDefault(t => t.Id == newProduct.Id);
+                if (old != null)
                 {
-                    Console.WriteLine("Found matching product. Updating Quantity.");
-                    ((ProductByQuantity) Products[i]).Quantity = product.Quantity;
+                    var index = productList.IndexOf(old);
+                    productList.RemoveAt(index);
+                    productList.Insert(index, newProduct);
+                    return true;
+                }
+                else
+                {
+                    productList.Add(newProduct);
                     return true;
                 }
             }
-
-            Console.WriteLine("Failed to update item quantity. Nothing was updated.");
             return false;
         }
+
+        // Not currently in use but will keep for now just in case
+        //public bool Update(Product product)
+        //{
+        //    for(int i = 0; i < Products.Count; i++)
+        //    {
+        //        if(Products[i].Id == product.Id)
+        //        {
+        //            Console.WriteLine("Found matching product. Updating information.");
+        //            Products[i] = product;
+        //            return true;
+        //        }
+        //    }
+        //    Console.WriteLine("Product ID not found. Nothing was updated.");
+        //    return false;
+        //}
 
         private string persistPath
             = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\";
@@ -196,26 +229,6 @@ namespace Library.GUI_App.Services
                     return foundProducts;
                 }
             }
-        }
-        public IEnumerable<Product> Search(string term)
-        {
-            IEnumerable<Product> foundProducts;
-
-            if (!string.IsNullOrEmpty(term))
-            {
-                searchTerm = term; // if new term is not blank, replace saved searchTerm with new term
-            }
-
-            if (!string.IsNullOrEmpty(searchTerm)) // if saved search term is not blank, use saved searchTerm
-            {
-                foundProducts = Products.Where(t => t.Name.ToLower().Contains(searchTerm.ToLower()));
-                var temp = foundProducts;
-                foundProducts = foundProducts.Concat(Products.Where(t => t.Description.ToLower().Contains(searchTerm.ToLower()) && !temp.Contains(t)));
-                return foundProducts;
-            }
-
-            //if searchTerm is blank, return nothing
-            return null;
         }
     }
 }

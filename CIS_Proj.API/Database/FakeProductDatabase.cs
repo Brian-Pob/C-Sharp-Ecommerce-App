@@ -19,7 +19,7 @@ namespace CIS_Proj.API.Database
 
         public static List<ProductByWeight> WeightProducts = new List<ProductByWeight>
         {
-            new ProductByWeight { Id=0, Name="Apple", Description="Bag of apples",    Weight=1, Price=1.00m},
+            new ProductByWeight { Id=0, Name="Apple", Description="Bag of apples", Weight=1, Price=1.00m},
             new ProductByWeight { Id=1, Name="Bananas", Description="Bag of bananas", Weight=2, Price=2.00m},
             new ProductByWeight { Id=2, Name="Carrots", Description="Bag of carrots", Weight=3, Price=1.50m},
         };
