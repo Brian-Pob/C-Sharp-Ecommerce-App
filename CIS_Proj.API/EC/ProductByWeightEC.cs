@@ -49,7 +49,9 @@ namespace CIS_Proj.API.EC
             if (cartProduct != null)
             {
                 currentCart.Remove(cartProduct);
-                currentCart.Add(productByWeight);
+                
+                if(productByWeight.Weight != 0)
+                    currentCart.Add(productByWeight);
             }
             else
             {

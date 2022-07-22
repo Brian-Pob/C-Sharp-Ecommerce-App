@@ -186,7 +186,7 @@ namespace Library.GUI_App.Services
          */
         public bool Delete(Product passedProduct)
         {
-            var cartProduct = Products.Find(t => t.Id == passedProduct.Id);
+            var cartProduct = Products.FirstOrDefault(t => t.Id == passedProduct.Id);
             var debug = InventoryService.Current.Products;
             if (cartProduct == null)
             {
@@ -198,9 +198,13 @@ namespace Library.GUI_App.Services
                 // first cast to ProductByWeight or ProductByQuantity to get the quantity/ weight
                 if (cartProduct is ProductByWeight cartProductByWeight)
                 {
-                    ProductByWeight inventoryProductByWeight = (ProductByWeight)InventoryService.Products.Where(t => t.Id == cartProductByWeight.Id).First();
+                    ProductByWeight inventoryProductByWeight = (ProductByWeight)InventoryService.Products.FirstOrDefault(t => t.Id == cartProductByWeight.Id);
                     inventoryProductByWeight.Weight += (passedProduct as ProductByWeight).Weight;
                     cartProductByWeight.Weight -= (passedProduct as ProductByWeight).Weight;
+
+                    _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{_cartName}", cartProductByWeight).Result;
+                    _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/AddOrUpdate", inventoryProductByWeight).Result;
+
                     if (cartProductByWeight.Weight <= 0) // if the weight is 0 or less, remove the product from the cart
                     {
                         Products.Remove(cartProductByWeight);
@@ -208,9 +212,13 @@ namespace Library.GUI_App.Services
                 }
                 else if (cartProduct is ProductByQuantity cartProductByQuantity)
                 {
-                    ProductByQuantity inventoryProductByQuantity = (ProductByQuantity)InventoryService.Products.Where(t => t.Id == cartProductByQuantity.Id).First();
+                    ProductByQuantity inventoryProductByQuantity = (ProductByQuantity)InventoryService.Products.FirstOrDefault(t => t.Id == cartProductByQuantity.Id);
                     inventoryProductByQuantity.Quantity += (passedProduct as ProductByQuantity).Quantity;
                     cartProductByQuantity.Quantity -= (passedProduct as ProductByQuantity).Quantity;
+                    
+                    _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{_cartName}", cartProductByQuantity).Result;
+                    _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/AddOrUpdate", inventoryProductByQuantity).Result;
+
                     if (cartProductByQuantity.Quantity <= 0)
                     {
                         Products.Remove(cartProductByQuantity);
