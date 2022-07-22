@@ -134,7 +134,7 @@ namespace Library.GUI_App.Services
             {
                 if (product is ProductByWeight)
                 {
-                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{_cartName}", product).Result;
+                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{CartName}", product).Result;
                    
                     var newProduct = JsonConvert.DeserializeObject<Product>(response);
 
@@ -142,7 +142,7 @@ namespace Library.GUI_App.Services
                 }
                 else if (product is ProductByQuantity)
                 {
-                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{_cartName}", product).Result;
+                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{CartName}", product).Result;
 
                     var newProduct = JsonConvert.DeserializeObject<Product>(response);
 
@@ -157,7 +157,7 @@ namespace Library.GUI_App.Services
                 if (product is ProductByWeight)
                 {
                     Console.WriteLine("Updating weight.");
-                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{_cartName}", product).Result;
+                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{CartName}", product).Result;
 
                     var newProduct = JsonConvert.DeserializeObject<Product>(response);
                     (newProduct as ProductByWeight).Weight += (cartProduct as ProductByWeight).Weight;
@@ -167,7 +167,7 @@ namespace Library.GUI_App.Services
                 else if (product is ProductByQuantity)
                 {
                     Console.WriteLine("Updating quantity.");
-                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{_cartName}", product).Result;
+                    var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{CartName}", product).Result;
 
                     var newProduct = JsonConvert.DeserializeObject<Product>(response);
                     (newProduct as ProductByQuantity).Quantity += (cartProduct as ProductByQuantity).Quantity;
@@ -202,7 +202,7 @@ namespace Library.GUI_App.Services
                     inventoryProductByWeight.Weight += (passedProduct as ProductByWeight).Weight;
                     cartProductByWeight.Weight -= (passedProduct as ProductByWeight).Weight;
 
-                    _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{_cartName}", cartProductByWeight).Result;
+                    _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{CartName}", cartProductByWeight).Result;
                     _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/AddOrUpdate", inventoryProductByWeight).Result;
 
                     if (cartProductByWeight.Weight <= 0) // if the weight is 0 or less, remove the product from the cart
@@ -216,7 +216,7 @@ namespace Library.GUI_App.Services
                     inventoryProductByQuantity.Quantity += (passedProduct as ProductByQuantity).Quantity;
                     cartProductByQuantity.Quantity -= (passedProduct as ProductByQuantity).Quantity;
                     
-                    _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{_cartName}", cartProductByQuantity).Result;
+                    _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{CartName}", cartProductByQuantity).Result;
                     _ = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/AddOrUpdate", inventoryProductByQuantity).Result;
 
                     if (cartProductByQuantity.Quantity <= 0)
@@ -260,6 +260,11 @@ namespace Library.GUI_App.Services
             {
                 return _cartName;
             }
+
+            set
+            {
+                _cartName = value;
+            }
         }
         public bool Load(string cartName)
         {
@@ -274,7 +279,7 @@ namespace Library.GUI_App.Services
                 productList = JsonConvert.DeserializeObject<List<Product>>(weightProductsJson);
                 var quantityProductsJson = new WebRequestHandler().Get($"http://localhost:5017/api/ProductByQuantity/Carts/{cartName}").Result;
                 productList.AddRange(JsonConvert.DeserializeObject<List<Product>>(quantityProductsJson));
-                _cartName = cartName;
+                CartName = cartName;
                 //var cartsJson = new WebRequestHandler().Get("http://localhost:5017/api/Carts").Result;
                 //var cartsDictionary = JsonConvert.DeserializeObject<Dictionary<string, List<Product>>>(cartsJson);
                 //var selectedCart = cartsDictionary[cartName];

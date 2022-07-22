@@ -1,5 +1,6 @@
 ﻿using CIS_Proj.API.Database;
 using Library.GUI_App.Models;
+using CIS_Proj.API.EC;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -16,28 +17,30 @@ namespace CIS_Proj.API.Controllers
             return FakeProductDatabase.Carts;
         }
 
-        [HttpGet("{name}")]
-        public List<Product> Get(string name)
-        {
-            return FakeProductDatabase.Carts.FirstOrDefault(c => c.Key == name).Value;
-        }
+        //[HttpGet("{name}")]
+        //public List<Product> Get(string name)
+        //{
+        //    return FakeProductDatabase.Carts.FirstOrDefault(c => c.Key == name).Value;
+        //}
 
         // POST api/<CartController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody] string cartName)
         {
+            new CartEC().Create(cartName);
         }
 
-        // PUT api/<CartController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        //// PUT api/<CartController>/5
+        //[HttpPut("{id}")]
+        //public void Put(int id, [FromBody] string value)
+        //{
+        //}
 
         // DELETE api/<CartController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpPost("Delete")]
+        public void Delete([FromBody] string cartName)
         {
+            new CartEC().Delete(cartName);
         }
     }
 }

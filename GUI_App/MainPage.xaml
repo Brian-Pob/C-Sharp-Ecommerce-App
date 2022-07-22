@@ -64,11 +64,11 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
+                <!--<ColumnDefinition/>-->
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="Add Product" HorizontalAlignment="Stretch" Click="Add_Click" Name="AddProductBtn"/>
             <Button Grid.Column="1" Content="Add Selected Item to Cart" HorizontalAlignment="Stretch" Click="Add_To_Cart_Click" Name="AddToCartBtn"/>
-            <Button Grid.Column="2" Content="Save Inventory and Cart" HorizontalAlignment="Stretch" Click="Save_Button_Click" Name="SaveBtn"/>
+            <!--<Button Grid.Column="2" Content="Save Inventory and Cart" HorizontalAlignment="Stretch" Click="Save_Button_Click" Name="SaveBtn"/>-->
         </Grid>
     </Grid>
 </Page>

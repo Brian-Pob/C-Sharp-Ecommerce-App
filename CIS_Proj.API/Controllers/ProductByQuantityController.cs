@@ -25,6 +25,7 @@ namespace CIS_Proj.API.Controllers
         }
 
         // POST api/<ValuesController>
+        // Adds to inventory
         [HttpPost("AddOrUpdate")]
         public ProductByQuantity AddOrUpdate(ProductByQuantity productByQuantity)
         {
@@ -44,6 +45,7 @@ namespace CIS_Proj.API.Controllers
             return productByQuantity;
         }
 
+        // Adds to cart with cartName
         [HttpPost("Carts/{cartName}")]
         public ProductByQuantity AddOrUpdate(string cartName, ProductByQuantity productByQuantity)
         {
@@ -51,16 +53,16 @@ namespace CIS_Proj.API.Controllers
 
         }
 
-        // PUT api/<ValuesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        //// PUT api/<ValuesController>/5
+        //[HttpPut("{id}")]
+        //public void Put(int id, [FromBody] string value)
+        //{
+        //}
 
-        // DELETE api/<ValuesController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        //// DELETE api/<ValuesController>/5
+        //[HttpDelete("{id}")]
+        //public void Delete(int id)
+        //{
+        //}
     }
 }

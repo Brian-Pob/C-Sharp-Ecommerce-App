@@ -7,10 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Choose Cart to Load"
-    PrimaryButtonText="Load Cart"
-    SecondaryButtonText="Create New Cart"
+    PrimaryButtonText="Confirm"
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+    >
     <ContentDialog.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
@@ -22,14 +21,30 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" Name="Row0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Cart Name:"/>
             <ComboBox Grid.Column="1" ItemsSource="{Binding CartList}" SelectedItem="{Binding SelectedCart}" HorizontalAlignment="Stretch" Name="CartComboBox"/>
+        </Grid>
+        <Grid Grid.Row="1" Name="Row1" Visibility="Visible">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Cart Name:"/>
+            <TextBox Grid.Column="1" PlaceholderText="Name" Text="{Binding Path=SelectedCart, Mode=TwoWay}" Name="SelectedCart_tb"/>
+        </Grid>
+        <Grid Grid.Row="2" Name="Row2" Visibility="Visible">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox Content="Create New Cart" x:Name="IsNewCart_cb" Checked="IsNewCart_Checked" Unchecked="IsNewCart_Checked" />
         </Grid>
     </Grid>
 </ContentDialog>

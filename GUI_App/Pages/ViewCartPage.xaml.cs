@@ -1,6 +1,7 @@
 ﻿using GUI_App.Dialogs;
 using Library.GUI_App.Models;
 using Library.GUI_App.Services;
+using Library.Standard.CIS_Proj.Utilities;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
@@ -276,15 +277,18 @@ namespace GUI_App.Pages
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
-                if (SelectedCart != null)
-                {
-                    if (!File.Exists(CartService.Current.persistPath + SelectedCart + ".json"))
-                        return;
-                    File.Delete((CartService.Current.persistPath + SelectedCart + ".json"));
-                }
+                //if (SelectedCart != null)
+                //{
+                //    if (!File.Exists(CartService.Current.persistPath + SelectedCart + ".json"))
+                //        return;
+                //    File.Delete((CartService.Current.persistPath + SelectedCart + ".json"));
+                //}
                 // delete cart file
 
                 CartService.Current.Products.Clear();
+                // delete cart from the database
+                _ = new WebRequestHandler().Post($"http://localhost:5017/api/Carts/Delete", CartService.Current.CartName).Result;
+
                 NotifyPropertyChanged("Products");
                 Frame.Navigate(typeof(MainPage), "checkedout");
             }

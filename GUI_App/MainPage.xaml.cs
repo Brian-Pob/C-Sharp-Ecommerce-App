@@ -79,8 +79,15 @@ namespace GUI_App
             //}
 
             ShowChooseCartDialog();
+            
+            //if(SelectedCart == null)
+            //{
+            //    ShowNameCartDialog();
+            //}
+
+            
+
             NotifyPropertyChanged("Products");
-            var test = Products;
 
             AddToCartBtn.IsEnabled = false;
             NavigationCacheMode = NavigationCacheMode.Enabled;
@@ -123,13 +130,26 @@ namespace GUI_App
             if (result == ContentDialogResult.Primary)
             {
                 SelectedCart = dialog.SelectedCart;
+                // look through Database Carts. If SelctedCart does not exist, create it
+                var cartsJson = new WebRequestHandler().Get("http://localhost:5017/api/Carts").Result;
+                var cartsDict = JsonConvert.DeserializeObject<Dictionary<string, List<Product>>>(cartsJson);
+                if (!cartsDict.ContainsKey(SelectedCart))
+                {
+                    _ = new WebRequestHandler().Post("http://localhost:5017/api/Carts", SelectedCart).Result;
+                }
+                CartService.Current.CartName = SelectedCart;
             }
             else
             {
                 SelectedCart = null;
             }
-            
+        }
 
+        private async void ShowNameCartDialog()
+        {
+            var dialog = new NameCartDialog();
+            var result = await dialog.ShowAsync();
+            SelectedCart = dialog.CartName;
         }
         private async void Add_Click(object sender, RoutedEventArgs e)
         {

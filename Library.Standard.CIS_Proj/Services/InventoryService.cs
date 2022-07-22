@@ -187,19 +187,20 @@ namespace Library.GUI_App.Services
             };
             try
             {
-                var inventoryJson = File.ReadAllText(persistPath+filename);
-                productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
+                var weightProductsJson = new WebRequestHandler().Get($"http://localhost:5017/api/ProductByWeight").Result;
+                productList = JsonConvert.DeserializeObject<List<Product>>(weightProductsJson);
+                var quantityProductsJson = new WebRequestHandler().Get($"http://localhost:5017/api/ProductByQuantity").Result;
+                productList.AddRange(JsonConvert.DeserializeObject<List<Product>>(quantityProductsJson));
+                
                 return true;
-
-
             }
             catch (Exception)
             {
 
-                //throw new Exception("Failed to load inventory from file.");
+                //throw;
                 return false;
-            }            
-            
+            }
+
         }
         
         private string searchTerm;

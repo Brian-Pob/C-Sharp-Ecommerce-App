@@ -31,7 +31,20 @@ namespace GUI_App.Dialogs
         private ObservableCollection<string> CartList { get; set; }
         
         private string _selectedCart;
-        public string SelectedCart { get { return _selectedCart; } set { _selectedCart = value; NotifyPropertyChanged(); } }
+        public string SelectedCart 
+        { 
+            get 
+            {
+                if (string.IsNullOrWhiteSpace(_selectedCart))
+                    return $"cart_{DateTime.Now:yyyy-MM-dd-HH-mm-ss}";
+                return _selectedCart; 
+            } 
+            set
+            {
+                _selectedCart = value;
+                NotifyPropertyChanged(); 
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -42,6 +55,7 @@ namespace GUI_App.Dialogs
         {
             this.InitializeComponent();
             DataContext = this;
+            Row1.Visibility = Visibility.Collapsed;
             CartList = new ObservableCollection<string>();
             
             var cartsJson = new WebRequestHandler().Get("http://localhost:5017/api/Carts").Result;
@@ -57,14 +71,36 @@ namespace GUI_App.Dialogs
 
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            CartService.Current.Load(CartList[CartComboBox.SelectedIndex]);
-            //SelectedCart = CartList[CartComboBox.SelectedIndex].Replace(".json", "");
-            SelectedCart = CartList[CartComboBox.SelectedIndex];
+            if (IsNewCart_cb.IsChecked == false)
+            {
+                CartService.Current.Load(CartList[CartComboBox.SelectedIndex]);
+                //SelectedCart = CartList[CartComboBox.SelectedIndex].Replace(".json", "");
+                SelectedCart = CartList[CartComboBox.SelectedIndex];
+            }
+            else
+            {
+                SelectedCart = SelectedCart_tb.Text;
+            }
 
         }
 
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
+            // create a new cart
+        }
+
+        private void IsNewCart_Checked(object sender, RoutedEventArgs e)
+        {
+            if (Row0.Visibility == Visibility.Collapsed)
+            {
+                Row0.Visibility = Visibility.Visible;
+                Row1.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                Row0.Visibility = Visibility.Collapsed;
+                Row1.Visibility = Visibility.Visible;
+            }
         }
     }
 }
