@@ -62,7 +62,7 @@ namespace GUI_App.Dialogs
             if (this.DataContext is ProductByQuantity)
             {
                 (this.DataContext as ProductByQuantity).Quantity = (int)CountBox.Value;
-                CartService.Current.AddToCart(this.DataContext as ProductByQuantity);
+                CartService.Current.AddToCart(this.DataContext as ProductByQuantity); // this product contains the quantity to be added to cart
             }
             else
             {

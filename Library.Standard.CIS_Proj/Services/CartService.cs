@@ -160,7 +160,7 @@ namespace Library.GUI_App.Services
                     var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByWeight/Carts/{_cartName}", product).Result;
 
                     var newProduct = JsonConvert.DeserializeObject<Product>(response);
-
+                    (newProduct as ProductByWeight).Weight += (cartProduct as ProductByWeight).Weight;
                     productList.Remove(cartProduct);
                     productList.Add(newProduct);
                 }
@@ -170,7 +170,7 @@ namespace Library.GUI_App.Services
                     var response = new WebRequestHandler().Post($"http://localhost:5017/api/ProductByQuantity/Carts/{_cartName}", product).Result;
 
                     var newProduct = JsonConvert.DeserializeObject<Product>(response);
-
+                    (newProduct as ProductByQuantity).Quantity += (cartProduct as ProductByQuantity).Quantity;
                     productList.Remove(cartProduct);
                     productList.Add(newProduct);
                 }
