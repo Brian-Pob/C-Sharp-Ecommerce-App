@@ -7,11 +7,11 @@ namespace CIS_Proj.API.EC
     {
         public void Create(string cartName)
         {
-            FakeProductDatabase.Carts.Add(cartName, new List<Product>());
+            Filebase.Current.CreateCart(cartName);
         }
         public void Delete(string cartName)
         {
-            FakeProductDatabase.Carts.Remove(cartName);
+            Filebase.Current.DeleteCart(cartName);
         }
     }
 }

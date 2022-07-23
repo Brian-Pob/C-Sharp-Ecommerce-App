@@ -22,33 +22,20 @@ namespace CIS_Proj.API.Controllers
         [HttpGet("Carts/{name}")]
         public List<ProductByWeight> Get(string name)
         {
-            return new ProductByWeightEC().Get(name);
+            return new ProductByWeightEC().GetCart(name);
         }
 
         // POST api/<ProductByWeightController>
         [HttpPost("AddOrUpdate")]
         public ProductByWeight AddOrUpdate(ProductByWeight productByWeight)
         {
-            if (productByWeight.Id == -1)
-            {
-                productByWeight.Id = FakeProductDatabase.NextId();
-                FakeProductDatabase.WeightProducts.Add(productByWeight);
-                return productByWeight;
-            }
-
-            var productToUpdate = FakeProductDatabase.WeightProducts.FirstOrDefault(p => p.Id == productByWeight.Id);
-            if (productToUpdate != null)
-            {
-                FakeProductDatabase.WeightProducts.Remove(productToUpdate);
-                FakeProductDatabase.WeightProducts.Add(productByWeight);
-            }
-            return productByWeight;
+            return new ProductByWeightEC().AddOrUpdate(productByWeight);
         }
 
         [HttpPost("Carts/{cartName}")]
         public ProductByWeight AddOrUpdate(string cartName, ProductByWeight productByWeight)
         {
-            return new ProductByWeightEC().AddOrUpdate(cartName, productByWeight);
+            return new ProductByWeightEC().AddOrUpdateCart(cartName, productByWeight);
 
         }
 

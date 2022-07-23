@@ -21,7 +21,7 @@ namespace CIS_Proj.API.Controllers
         [HttpGet("Carts/{name}")]
         public List<ProductByQuantity> Get(string name)
         {
-            return new ProductByQuantityEC().Get(name);
+            return new ProductByQuantityEC().GetCart(name);
         }
 
         // POST api/<ValuesController>
@@ -29,40 +29,17 @@ namespace CIS_Proj.API.Controllers
         [HttpPost("AddOrUpdate")]
         public ProductByQuantity AddOrUpdate(ProductByQuantity productByQuantity)
         {
-            if (productByQuantity.Id == -1)
-            {
-                productByQuantity.Id = FakeProductDatabase.NextId();
-                FakeProductDatabase.QuantityProducts.Add(productByQuantity);
-                return productByQuantity;
-            }
-
-            var productToUpdate = FakeProductDatabase.QuantityProducts.FirstOrDefault(p => p.Id == productByQuantity.Id);
-            if (productToUpdate != null)
-            {
-                FakeProductDatabase.QuantityProducts.Remove(productToUpdate);
-                FakeProductDatabase.QuantityProducts.Add(productByQuantity);
-            }
-            return productByQuantity;
+            return new ProductByQuantityEC().AddOrUpdate(productByQuantity);
         }
 
         // Adds to cart with cartName
         [HttpPost("Carts/{cartName}")]
         public ProductByQuantity AddOrUpdate(string cartName, ProductByQuantity productByQuantity)
         {
-            return new ProductByQuantityEC().AddOrUpdate(cartName, productByQuantity);
+            return new ProductByQuantityEC().AddOrUpdateCart(cartName, productByQuantity);
 
         }
 
-        //// PUT api/<ValuesController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
 
-        //// DELETE api/<ValuesController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

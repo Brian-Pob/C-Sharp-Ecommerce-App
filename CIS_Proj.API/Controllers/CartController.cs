@@ -14,7 +14,7 @@ namespace CIS_Proj.API.Controllers
         [HttpGet]
         public Dictionary<string, List<Product>> Get()
         {
-            return FakeProductDatabase.Carts;
+            return Filebase.Current.Carts;
         }
 
         //[HttpGet("{name}")]
@@ -30,11 +30,6 @@ namespace CIS_Proj.API.Controllers
             new CartEC().Create(cartName);
         }
 
-        //// PUT api/<CartController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
 
         // DELETE api/<CartController>/5
         [HttpPost("Delete")]

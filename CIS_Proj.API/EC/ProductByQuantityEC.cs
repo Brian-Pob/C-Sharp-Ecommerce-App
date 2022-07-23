@@ -7,53 +7,28 @@ namespace CIS_Proj.API.EC
     {
         public List<ProductByQuantity> Get()
         {
-            return FakeProductDatabase.QuantityProducts;
+            return Filebase.Current.Products.Where(p => p is ProductByQuantity).Cast<ProductByQuantity>().ToList();
         }
 
-        public List<ProductByQuantity> Get(string name)
+        // Get List<ProductByQuantity> From Cart with cartName
+        public List<ProductByQuantity> GetCart(string cartName)
         {
-            var tempList = FakeProductDatabase.Carts[name];
-            List<ProductByQuantity> tempList2 = new List<ProductByQuantity>();
-            tempList.ForEach(p =>
-            {
-                if (p is ProductByQuantity)
-                {
-                    tempList2.Add(p as ProductByQuantity);
-                }
-            });
-            return tempList2;
+            return Filebase.Current.Carts[cartName].Where(p => p is ProductByQuantity).Cast<ProductByQuantity>().ToList();
+
         }
 
-        public ProductByQuantity AddOrUpdate(string cartName, ProductByQuantity productByQuantity)
+        public ProductByQuantity AddOrUpdate(ProductByQuantity productByQuantity)
         {
-            // POST to api/ProdcutByWeight/Carts/{cartName}
-            // This will search through the cartlist in the DB for the item
-            var tempCart = Get(cartName);
-            // Make sure to check that the Key and List pair exist
-            // If the list does not exist, create it
-            if (tempCart == null)
-            {
-                FakeProductDatabase.Carts.Add("cartName", new List<Product>());
-            }
+            // since Filebase assigns the ID, no need to assign ID here
 
-            // After the list is created, or if it already exists, search through the list for the passed product
-            var currentCart = FakeProductDatabase.Carts[cartName];
-            var cartProduct = currentCart.FirstOrDefault(p => p.Id == productByQuantity.Id);
-            // If the product is found in the cart, update the count
-            // If the product is not found, add it to the list
-            if (cartProduct != null)
-            {
-                currentCart.Remove(cartProduct);
+            return Filebase.Current.AddOrUpdateInventory(productByQuantity) as ProductByQuantity ?? new ProductByQuantity();
 
-                if (productByQuantity.Quantity != 0)
-                    currentCart.Add(productByQuantity);
-            }
-            else
-            {
-                currentCart.Add(productByQuantity);
-            }
-            // Now the list in the Database is updated
-            return productByQuantity;
+        }
+
+        public ProductByQuantity AddOrUpdateCart(string cartName, ProductByQuantity productByQuantity)
+        {
+            return Filebase.Current.AddOrUpdateCart(cartName, productByQuantity) as ProductByQuantity ?? new ProductByQuantity();
+
         }
     }
 }
