@@ -1,0 +1,85 @@
+﻿<ContentDialog
+    x:Class="GUI_App.Dialogs.AddItemDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:GUI_App.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    Title="Add Item Dialog"
+    PrimaryButtonText="Add"
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+    <ContentDialog.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+    </ContentDialog.Resources>
+
+    <Grid RowSpacing="10" >
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Name" ></TextBlock>
+            <TextBox Grid.Column="1" Text="{Binding Path=Name, Mode=TwoWay}"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Description"></TextBlock>
+            <TextBox Grid.Column="1" Text="{Binding Path=Description, Mode=TwoWay}" Height="92" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="QtyOrWtTextBlock" Grid.Column="0" Text="Quantity"></TextBlock>
+            <controls:NumberBox Grid.Column="1" Value="{x:Bind Path=Count, Mode=TwoWay}" ValidationMode="InvalidInputOverwritten" Name="CountBox"
+                                SmallChange="1" LargeChange="5" SpinButtonPlacementMode="Compact"
+                                Minimum="0"/>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Name="PriceTextBlock" Text="Price"></TextBlock>
+            <controls:NumberBox Grid.Column="1" Value="{Binding Path=DoublePrice, Mode=TwoWay}" ValidationMode="InvalidInputOverwritten" Name="PriceBox"
+                                SmallChange="1.00" LargeChange="10.00" SpinButtonPlacementMode="Compact"
+                                Minimum="0.00"/>
+        </Grid>
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <RadioButton Grid.Column="0" x:Name="QuantityRadBtn" Margin="5" Checked="HandleCheck" GroupName="QtyOrWt" Content="By Quantity" IsChecked="True"/>
+            <RadioButton Grid.Column="1" x:Name="WeightRadBtn" Margin="5" Checked="HandleCheck" GroupName="QtyOrWt" Content="By Weight" />
+        </Grid>
+        <Grid Grid.Row="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <CheckBox Grid.Column="0" x:Name="BogoCb" Content="BOGO Deal" Checked="BogoCbCheck" Unchecked="BogoCbUncheck" />
+        </Grid>
+    </Grid>
+</ContentDialog>

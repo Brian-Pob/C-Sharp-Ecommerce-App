@@ -1,25 +1,18 @@
 ﻿using System;
-using Library.CIS_Proj.Models;
+using Library.GUI_App.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Library.CIS_Proj.Utilities;
+using Library.GUI_App.Utilities;
+using System.IO;
 
-namespace Library.CIS_Proj.Services
+namespace Library.GUI_App.Services
 {
 	public class InventoryService
 	{
-        private ListNavigator<Product> listNavigator;
-        public ListNavigator<Product> ListNavigator
-        {
-            get
-            {
-                return listNavigator;
-            }
-        }
-        private CartService? cartService;
+        private CartService cartService;
 		public CartService CartService
         {
 			get
@@ -42,7 +35,7 @@ namespace Library.CIS_Proj.Services
             }
         }
 
-		private static InventoryService? current;
+		private static InventoryService current;
 		public static InventoryService Current
         {
             get
@@ -59,7 +52,6 @@ namespace Library.CIS_Proj.Services
 		private InventoryService()
 		{
             productList = new List<Product>();
-            listNavigator = new ListNavigator<Product>(SortedList);
 		}
 
         public int NextId
@@ -75,6 +67,8 @@ namespace Library.CIS_Proj.Services
             }
         }
 
+        
+        
         /* CRUD methods */
         public bool Create(Product product)
         {
@@ -120,15 +114,28 @@ namespace Library.CIS_Proj.Services
             return false;
         }
 
+        private string persistPath
+            = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\";
         public bool Save(string filename = "inventory.json")
         {
             var options = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
             };
-            var inventoryJson = JsonConvert.SerializeObject(productList, options);
-            File.WriteAllText(filename, inventoryJson);
-            return true;
+
+            try
+            {
+                var inventoryJson = JsonConvert.SerializeObject(productList, options);
+
+                File.WriteAllText(persistPath+filename, inventoryJson);
+                return true;
+            }
+            catch (Exception)
+            {
+
+                //throw;
+                return false;
+            }
         }
 
         public bool Load(string filename = "inventory.json")
@@ -136,51 +143,54 @@ namespace Library.CIS_Proj.Services
             var options = new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
-            };
-            var inventoryJson = File.ReadAllText(filename);
-            productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
-            listNavigator = new ListNavigator<Product>(SortedList);
-            return true;
-        }
 
-        private int _sortBy;
-        public int SortBy
+            };
+            try
+            {
+                var inventoryJson = File.ReadAllText(persistPath+filename);
+                productList = JsonConvert.DeserializeObject<List<Product>>(inventoryJson, options) ?? new List<Product>();
+                return true;
+
+
+            }
+            catch (Exception)
+            {
+
+                //throw new Exception("Failed to load inventory from file.");
+                return false;
+            }            
+            
+        }
+        
+        private string searchTerm;
+        public string SearchTerm
         {
             get
             {
-                return _sortBy;
+                return searchTerm;
             }
 
             set
             {
-                _sortBy = value;
-                listNavigator = new ListNavigator<Product>(SortedList);
+                searchTerm = value;
             }
         }
-        public IEnumerable<Product> SortedList
+        public IEnumerable<Product> SearchResults
         {
             get
             {
-                switch (SortBy)
+                if (string.IsNullOrEmpty(searchTerm))
                 {
-                    case 1:
-                        return (Products.OrderBy(t => t.Name));
-                    case 2:
-                        return (Products.OrderBy(t => t.Price));
-                    case 0:
-                    default:
-                        return (Products.OrderBy(t => t.Id));
+                    return new List<Product>();
                 }
-            }
-        }
+                else
+                {
 
-        private string searchTerm;
-        private ListNavigator<Product> searchListNavigator;
-        public ListNavigator<Product> SearchListNavigator
-        {
-            get
-            {
-                return searchListNavigator;
+                    var foundProducts = Products.Where(t => t.Name.ToLower().Contains(searchTerm.ToLower()));
+                    var temp = foundProducts;
+                    foundProducts = foundProducts.Concat(Products.Where(t => t.Description.ToLower().Contains(searchTerm.ToLower()) && !temp.Contains(t)));
+                    return foundProducts;
+                }
             }
         }
         public IEnumerable<Product> Search(string term)
@@ -189,32 +199,19 @@ namespace Library.CIS_Proj.Services
 
             if (!string.IsNullOrEmpty(term))
             {
-                searchTerm = term;
+                searchTerm = term; // if new term is not blank, replace saved searchTerm with new term
             }
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(searchTerm)) // if saved search term is not blank, use saved searchTerm
             {
                 foundProducts = Products.Where(t => t.Name.ToLower().Contains(searchTerm.ToLower()));
                 var temp = foundProducts;
                 foundProducts = foundProducts.Concat(Products.Where(t => t.Description.ToLower().Contains(searchTerm.ToLower()) && !temp.Contains(t)));
-            }
-            else
-            {
-                foundProducts = Products;
+                return foundProducts;
             }
 
-            switch (SortBy)
-            {
-                case 1:
-                    foundProducts = (foundProducts.OrderBy(t => t.Name)); break;
-                case 2:
-                    foundProducts = (foundProducts.OrderBy(t => t.Price)); break;
-                case 0:
-                default:
-                    foundProducts = (foundProducts.OrderBy(t => t.Id)); break;
-            }
-            searchListNavigator = new ListNavigator<Product>(foundProducts);
-            return foundProducts;
+            //if searchTerm is blank, return nothing
+            return null;
         }
     }
 }

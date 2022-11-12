@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Library.CIS_Proj.Models
+namespace Library.GUI_App.Models
 {
 	public class Product
 	{
@@ -18,13 +18,26 @@ namespace Library.CIS_Proj.Models
 				price = Decimal.Round(value, 2);
 			}
 		}
+		public Double DoublePrice
+        {
+            get
+            {
+				return (double)price;
+            }
+            set
+            {
+				Price = (decimal)value;
+            }
+        }
 
-		public Product()
+		public decimal Count { get; set; }
+        public string Unit { get; set; }
+        public Product()
         {
 			Id = -1;
             Name = string.Empty;
             Description = string.Empty;
-            Price = 0;
+            //Price = 0;
             IsBogo = false;
         }
 		public Product Clone()
